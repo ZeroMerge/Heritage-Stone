@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useUIStore, useAuthStore } from "@/store";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useEffect, useState } from "react";
 
 const navItems = [
@@ -158,11 +158,12 @@ export function Sidebar({ className }: { className?: string }) {
       {/* ── User Profile ─────────────────────────────────────── */}
       <div className="shrink-0 p-3 border-t border-[var(--border-subtle)] overflow-hidden">
         <div className="flex items-center gap-3 px-3 py-2 bg-[var(--surface-subtle)]">
-          <Avatar className="w-8 h-8 flex-shrink-0 bg-[var(--hs-accent)]">
-            <AvatarFallback className="text-white text-xs font-medium bg-transparent">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            seed={user?.email}
+            avatarUrl={user?.avatarUrl}
+            initials={`${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`}
+            size={32}
+          />
           <div className={cn("s-label flex flex-col overflow-hidden", labelsHidden && "s-label-hidden")}>
             <span className="text-sm font-medium text-[var(--text-primary)] truncate">
               {user?.firstName} {user?.lastName}

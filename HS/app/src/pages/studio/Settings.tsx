@@ -11,6 +11,7 @@ import { useAuthStore, useUIStore } from '@/store'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
+
 // ─── Section Card ─────────────────────────────────────────────────────────────
 
 function SectionCard({ 
@@ -101,19 +102,24 @@ function Toggle({
 
 // ─── Main Settings Page ───────────────────────────────────────────────────────
 
-const PRESET_AVATARS = [
-  { id: 'av-1', color: 'bg-emerald-500', icon: 'HS' },
-  { id: 'av-2', color: 'bg-blue-500', icon: 'RS' },
-  { id: 'av-3', color: 'bg-purple-500', icon: 'MN' },
-  { id: 'av-4', color: 'bg-orange-500', icon: 'ST' },
-  { id: 'av-5', color: 'bg-rose-500', icon: 'AD' },
-  { id: 'av-6', color: 'bg-indigo-500', icon: 'BK' },
+// DiceBear avatar styles — stored as the `style` part of the API URL
+const AVATAR_STYLES = [
+  { id: 'lorelei',      label: '3D Illustrated' },
+  { id: 'fun-emoji',   label: 'Fun Emoji' },
+  { id: 'adventurer',  label: 'Adventurer' },
+  { id: 'micah',       label: 'Sketch' },
+  { id: 'personas',    label: 'Persona' },
+  { id: 'pixel-art',   label: 'Pixel Art' },
 ]
+
+function diceBearUrl(seed: string, style = 'lorelei') {
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&backgroundType=gradientLinear&radius=50`;
+}
 
 export function Settings() {
   const { user, updateProfile } = useAuthStore()
   const { showToast } = useUIStore()
-  const [selectedAvatar, setSelectedAvatar] = useState('av-1')
+  const [selectedStyle, setSelectedStyle] = useState('lorelei')
   const [firstName, setFirstName] = useState(user?.firstName || '')
   const [lastName, setLastName] = useState(user?.lastName || '')
   const [studioName, setStudioName] = useState('Heritage Stone')
@@ -142,7 +148,7 @@ export function Settings() {
       if (user) {
         setFirstName(user.firstName || '')
         setLastName(user.lastName || '')
-        setSelectedAvatar(user.avatarUrl || 'av-1')
+        setSelectedStyle(user.avatarUrl && AVATAR_STYLES.find(s => s.id === user.avatarUrl) ? user.avatarUrl : 'lorelei')
         // In a real app we'd fetch notification settings from profiles table here
       }
     };
@@ -156,7 +162,7 @@ export function Settings() {
       await updateProfile({
         firstName,
         lastName,
-        avatarUrl: selectedAvatar, // We're using the ID as the URL for now as per minimal preset system
+        avatarUrl: selectedStyle, // stored as the dicebear style id
       })
       showToast("Profile updated successfully", "success")
     } catch (error) {
@@ -211,31 +217,38 @@ export function Settings() {
         >
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row items-center gap-8">
-              <div className="relative">
-                <div className={cn(
-                  "w-24 h-24 rounded-full flex items-center justify-center shadow-xl border-4 border-white dark:border-[#202c33] transition-all duration-300",
-                  PRESET_AVATARS.find(a => a.id === selectedAvatar)?.color || 'bg-[var(--hs-accent)]'
-                )}>
-                  <span className="text-white text-3xl font-bold tracking-tight">
-                    {PRESET_AVATARS.find(a => a.id === selectedAvatar)?.icon}
-                  </span>
+              {/* Live 3D avatar preview */}
+              <div className="relative flex-shrink-0">
+                <img
+                  src={diceBearUrl(user?.email || 'default', selectedStyle)}
+                  alt="Your avatar"
+                  className="w-24 h-24 rounded-full shadow-xl border-4 border-white dark:border-[#202c33]"
+                />
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[var(--hs-accent)] flex items-center justify-center shadow">
+                  <Palette className="w-3.5 h-3.5 text-white" />
                 </div>
               </div>
-              
+
               <div className="flex-1">
-                <p className="text-sm font-medium text-[var(--text-secondary)] mb-4 uppercase tracking-wider">Choose your avatar</p>
-                <div className="grid grid-cols-6 gap-3">
-                  {PRESET_AVATARS.map((avatar) => (
+                <p className="text-sm font-medium text-[var(--text-secondary)] mb-4 uppercase tracking-wider">Choose avatar style</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {AVATAR_STYLES.map((style) => (
                     <button
-                      key={avatar.id}
-                      onClick={() => setSelectedAvatar(avatar.id)}
+                      key={style.id}
+                      onClick={() => setSelectedStyle(style.id)}
                       className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 shadow-sm",
-                        avatar.color,
-                        selectedAvatar === avatar.id ? "ring-2 ring-offset-2 ring-[var(--hs-accent)] scale-110" : "opacity-70 hover:opacity-100"
+                        "flex flex-col items-center gap-1.5 p-2 rounded-xl border-2 transition-all hover:scale-105",
+                        selectedStyle === style.id
+                          ? "border-[var(--hs-accent)] bg-[var(--hs-accent)]/5"
+                          : "border-[var(--border-subtle)] hover:border-[var(--hs-accent)]/40"
                       )}
                     >
-                      <span className="text-white text-[10px] font-bold">{avatar.icon}</span>
+                      <img
+                        src={diceBearUrl(user?.email || 'default', style.id)}
+                        alt={style.label}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <span className="text-[10px] font-medium text-[var(--text-secondary)]">{style.label}</span>
                     </button>
                   ))}
                 </div>
