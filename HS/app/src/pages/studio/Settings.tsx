@@ -129,7 +129,7 @@ export function Settings() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const { data, error } = await supabase.from('studio_settings').select('*').maybeSingle()
+      const { data } = await supabase.from('studio_settings').select('*').maybeSingle()
       if (data) {
         setSettingsId(data.id)
         setStudioName(data.studio_name || 'Heritage Stone')

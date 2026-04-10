@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,33 +10,33 @@
   /* Brand Colors - HeritageStone */
   --hs-primary: #0F0F0F;
   --hs-secondary: #6B7280;
-  --hs-accent: #C9A96E;
-  --hs-accent-light: #E8DCC8;
+  --hs-accent: #ffa800; /* Orange Gold */
+  --hs-accent-light: rgba(255, 168, 0, 0.2);
   
-  /* Background Scale */
-  --bg-primary: #FAFAFA;
-  --bg-secondary: #F5F5F5;
-  --bg-tertiary: #FFFFFF;
-  --bg-elevated: #FFFFFF;
+  /* Background Scale (Ash / Cream) */
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #e5e5e5;
+  --bg-tertiary: #ffffff;
+  --bg-elevated: #ffffff;
   
   /* Surface Colors */
-  --surface-default: #FFFFFF;
-  --surface-hover: #F9F9F9;
-  --surface-active: #F3F3F3;
-  --surface-subtle: #F5F5F5;
+  --surface-default: #ffffff;
+  --surface-hover: #fafafa;
+  --surface-active: #f0f0f0;
+  --surface-subtle: #f9f9f9;
   
   /* Border Colors */
-  --border-default: #E5E5E5;
-  --border-subtle: #F0F0F0;
-  --border-strong: #D4D4D4;
-  --border-muted: #E8E8E8;
+  --border-default: #d4d4d4;
+  --border-subtle: #e5e5e5;
+  --border-strong: #a3a3a3;
+  --border-muted: #f0f0f0;
   
   /* Text Colors */
-  --text-primary: #0F0F0F;
-  --text-secondary: #6B7280;
-  --text-tertiary: #9CA3AF;
-  --text-muted: #A1A1AA;
-  --text-inverse: #FFFFFF;
+  --text-primary: #0f0f0f;
+  --text-secondary: #52525b;
+  --text-tertiary: #a1a1aa;
+  --text-muted: #e5e5e5;
+  --text-inverse: #ffffff;
   
   /* Status Colors */
   --status-live: #10B981;
@@ -70,8 +70,8 @@
   --radius-full: 999px; /* Only exception: badges/pills */
   
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Manrope', sans-serif;
   --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
   
   /* Transitions */
@@ -84,6 +84,37 @@
   --cs: #C9A96E;
 }
 
+.dark {
+  --hs-primary:  #f4f4f5;
+  --hs-secondary: #a1a1aa;
+
+  /* ── Elevation (OPAQUE — no alpha on bg-* tokens) ───────────────────────── */
+  --bg-primary:   #09090f;
+  --bg-secondary: #0e0e1a;
+  --bg-tertiary:  #141420;   /* cards, panels */
+  --bg-elevated:  #1c1c2a;   /* dropdowns */
+
+  /* OPAQUE surfaces — modals/popovers won't bleed through */
+  --surface-default: #141420;
+  --surface-hover:   #1c1c2a;
+  --surface-active:  #22223a;
+  --surface-subtle:  #0e0e1a;
+
+  /* Translucent borders are fine — they don't create see-through effects */
+  --border-default: rgba(255,255,255,0.08);
+  --border-subtle:  rgba(255,255,255,0.04);
+  --border-strong:  rgba(255,255,255,0.16);
+  --border-muted:   rgba(255,255,255,0.03);
+
+  --text-primary:   #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary:  #71717a;
+  --text-muted:     #3f3f46;
+  --text-inverse:   #0f0f0f;
+}
+
+
+
 /* ─── Base Styles ───────────────────────────────────────────────────────────── */
 
 * {
@@ -93,7 +124,7 @@
 }
 
 html {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans); /* DM Sans */
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -104,30 +135,142 @@ html {
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
+}
+
+/* ─── Responsive Shell (Love / Cherished / Goldmine) ────────────────────────
+ * These classes mirror the Hub design system and are applied in Layout.tsx.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Mobile-only topbar */
+.s-topbar-mobile {
+  display: none;
+  height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  background: var(--surface-default);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  z-index: 40;
+}
+
+.shell-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Desktop topbar row inside main column */
+.topbar-desktop {
+  display: flex;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-primary);
+}
+
+/* Sidebar width transition */
+.sidebar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-default);
+  border-right: 1px solid var(--border-subtle);
+  overflow: hidden;
+  z-index: 30;
+  /* width is set inline by framer-motion */
+}
+
+/* Sidebar labels — use max-width transition, NOT display:none */
+.s-label {
+  overflow: hidden;
+  max-width: 160px;
+  opacity: 1;
+  transition: max-width 200ms cubic-bezier(0.16,1,0.3,1),
+              opacity   120ms cubic-bezier(0.16,1,0.3,1);
+  white-space: nowrap;
+}
+.s-label-hidden {
+  max-width: 0;
+  opacity: 0;
+}
+
+/* Mobile bottom nav */
+.s-bottom-nav {
+  display: none;
+  height: 64px;
+  background: var(--surface-default);
+  border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  z-index: 40;
+}
+
+/* ── LOVE (< 768px) ──────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .s-topbar-mobile { display: flex; }
+  .topbar-desktop  { display: none; }
+  .s-bottom-nav    { display: flex; align-items: stretch; }
+  /* Hide sidebar via CSS — framer-motion width handled in component */
+}
+
+/* ── CHERISHED (768–1279px) ──────────────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .s-topbar-mobile { display: none; }
+  .s-bottom-nav    { display: none; }
+}
+
+/* ── GOLDMINE (≥ 1280px) ──────────────────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .s-topbar-mobile { display: none; }
+  .s-bottom-nav    { display: none; }
+}
+
+/* ─── Modal Panel ────────────────────────────────────────────────────────────
+ * Enforces fully-opaque background so dark mode doesn't bleed through.
+ * ──────────────────────────────────────────────────────────────────────────── */
+.modal-panel {
+  background: var(--surface-default) !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.36);
+}
+.dark .modal-panel {
+  background: #1e1e2e !important;  /* explicit opaque fallback */
 }
 
 /* ─── Typography ────────────────────────────────────────────────────────────── */
 
 .heading-display {
-  font-family: var(--font-display);
+  font-family: var(--font-display); /* Manrope */
   font-size: 2.5rem;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .heading-xl {
-  font-family: var(--font-sans);
+  font-family: var(--font-display); /* Manrope */
   font-size: 1.875rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.02em;
 }
 
 .heading-lg {
-  font-family: var(--font-sans);
+  font-family: var(--font-display); /* Manrope */
   font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.3;
@@ -135,21 +278,21 @@ body {
 }
 
 .heading-md {
-  font-family: var(--font-sans);
+  font-family: var(--font-display); /* Manrope */
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
 }
 
 .heading-sm {
-  font-family: var(--font-sans);
+  font-family: var(--font-display); /* Manrope */
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.4;
 }
 
 .heading-xs {
-  font-family: var(--font-sans);
+  font-family: var(--font-display); /* Manrope */
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.5;

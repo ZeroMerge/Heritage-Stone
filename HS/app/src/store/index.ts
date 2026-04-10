@@ -952,7 +952,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   fetchDashboardStats: async () => {
     try {
-      const { data: projects } = await supabase.from("brands").select("id, status, is_published, approval_states");
+      const { data: projects } = await supabase.from("brands").select("id, brand_name, status, is_published, approval_states");
       const { count: unreadCount } = await supabase
         .from("messages")
         .select("*", { count: 'exact', head: true })

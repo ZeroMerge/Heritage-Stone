@@ -8,7 +8,7 @@ export type ProjectStatus = "draft" | "active" | "live" | "archived";
 export type PortalTemplate = "meridian";
 export type PermissionLevel = "full" | "designer" | "copywriter" | "marketing" | "executive";
 export type ApprovalStatus = "pending" | "approved" | "revision_requested" | "locked";
-export type AssetCategory = "logo" | "color" | "typography" | "photography" | "document" | "other";
+export type AssetCategory = "logo" | "brand_logos" | "color" | "typography" | "photography" | "document" | "guidelines" | "icons" | "brand_icons" | "brand_resources" | "other";
 export type MemberRole = "owner" | "admin" | "designer" | "strategist" | "copywriter" | "viewer";
 export type PortalView = "brand" | "assets" | "changelog" | "requests" | "team";
 
@@ -31,6 +31,7 @@ export type ActivityEventType =
   | "section_revised"
   | "section_updated"
   | "asset_uploaded"
+  | "asset_deleted"
   | "member_invited"
   | "member_removed"
   | "portal_published"

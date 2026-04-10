@@ -3,11 +3,11 @@ import { useLocation, Link } from "react-router-dom";
 import { Search, Bell, Menu, ChevronDown, User, Settings, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore, useAuthStore, useDocumentEditorStore } from "@/store";
-import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Topbar() {
   const location = useLocation();
-  const { sidebarCollapsed, toggleSidebar } = useUIStore();
+  const { toggleSidebar } = useUIStore();
   const { user, logout } = useAuthStore();
   const { unsavedChanges } = useDocumentEditorStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -24,10 +24,7 @@ export function Topbar() {
 
   return (
     <header
-      className={cn(
-        "fixed top-0 right-0 h-16 bg-[var(--surface-default)]/95 backdrop-blur-sm border-b border-[var(--border-subtle)] z-30 flex items-center justify-between px-6 transition-all duration-300",
-        sidebarCollapsed ? "left-[72px]" : "left-[240px]"
-      )}
+      className="h-16 w-full bg-[var(--surface-default)]/95 backdrop-blur-sm border-b border-[var(--border-subtle)] flex items-center justify-between px-6 transition-colors"
     >
       {/* Left: Breadcrumb / Mobile Menu */}
       <div className="flex items-center gap-4">
@@ -56,6 +53,8 @@ export function Topbar() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        <ThemeToggle />
+        
         {/* Search */}
         <button className="p-2 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-colors">
           <Search className="w-5 h-5" />

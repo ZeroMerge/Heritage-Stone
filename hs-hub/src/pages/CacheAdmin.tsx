@@ -1,7 +1,7 @@
 // hs-hub/src/pages/CacheAdmin.tsx
 import { useEffect, useState } from "react";
 import { cacheApi, type CacheStats } from "../lib/api.ts";
-import { Database, Trash2, RefreshCw, Loader2 } from "lucide-react";
+import { Database, RefreshCw, Loader2, XCircle } from "lucide-react";
 import { clsx } from "clsx";
 
 export function CacheAdmin() {
@@ -34,11 +34,11 @@ export function CacheAdmin() {
   };
 
   return (
-    <div className="p-12 max-w-4xl animate-fade-in">
-      <div className="flex items-center justify-between mb-12 border-b border-[var(--hs-border)] pb-8">
+    <div className="page-pad-lg animate-fade-in">
+      <div className="page-header" style={{ marginBottom: '2rem' }}>
         <div>
-          <h1 className="heading-xl text-[var(--hs-text)] mb-2">Memory Cache</h1>
-          <p className="text-sm text-[var(--hs-text-muted)]">
+          <h1 className="heading-lg text-[var(--text-primary)] mb-1">Memory Cache</h1>
+          <p className="text-small text-[var(--text-tertiary)]">
             Active in-memory hydration nodes for production endpoints.
           </p>
         </div>
@@ -86,7 +86,7 @@ export function CacheAdmin() {
       ) : stats ? (
         <div className="space-y-12">
           {/* Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="hs-grid-2">
             {[
               { label: "COLLECTED NODES", value: stats.size, unit: "SLUGS" },
               { label: "EXPIRATION WINDOW", value: stats.defaultTtlMs / 1000, unit: "SECONDS" },

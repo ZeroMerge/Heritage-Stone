@@ -34,38 +34,41 @@ export function BrandList() {
   useEffect(() => { void fetchBrands(); }, []);
 
   return (
-    <div className="p-8 animate-fade-in">
+    <div className="page-pad animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-semibold text-[var(--hs-text)]">Brands</h1>
-          <p className="text-sm text-[var(--hs-text-muted)] mt-1">
+          <h1 className="heading-lg text-[var(--text-primary)]">Brands</h1>
+          <p className="text-small text-[var(--text-tertiary)] mt-0.5">
             {brands.length} brand{brands.length !== 1 ? "s" : ""} registered
           </p>
         </div>
         <button
           onClick={() => void fetchBrands()}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--hs-surface-2)] border border-[var(--hs-border)] text-[var(--hs-text-muted)] hover:text-[var(--hs-text)] rounded transition-colors"
+          className="hs-btn hs-btn-secondary"
         >
           <RefreshCw className={clsx("w-4 h-4", loading && "animate-spin")} />
-          Refresh
+          <span className="sidebar-label">Refresh</span>
         </button>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-950/30 border border-red-900 rounded text-red-400 text-sm">
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
           {error}
         </div>
       )}
 
       {loading && !brands.length ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="hs-grid">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-44 rounded-lg bg-[var(--hs-surface)] border border-[var(--hs-border)] animate-pulse" />
+            <div
+              key={i}
+              className="h-44 bg-[var(--bg-surface)] border border-[var(--border-default)] animate-pulse"
+            />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="hs-grid">
           {brands.map((brand) => (
             <BrandCard key={brand.id} brand={brand} />
           ))}
@@ -80,54 +83,52 @@ function BrandCard({ brand }: { brand: BrandRow }) {
 
   return (
     <div className="hs-card flex flex-col overflow-hidden">
-      {/* Color band */}
-      <div className="h-1 bg-[var(--hs-accent)]" />
+      {/* Accent line */}
+      <div className="h-0.5 bg-[var(--hs-accent)]" />
 
-      <div className="p-6 flex-1">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div>
-            <h2 className="heading-md text-[var(--hs-text)] leading-tight mb-1">
+      <div className="p-5 flex-1">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="min-w-0">
+            <h2 className="heading-sm text-[var(--text-primary)] leading-tight mb-1 truncate">
               {brand.brand_name}
             </h2>
-            <span className="text-xs-mono">
-              /{brand.slug}
-            </span>
+            <span className="text-xs-mono">/{brand.slug}</span>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             {brand.password_protected && (
               <span title="Password protected">
-                <Lock className="w-3.5 h-3.5 text-[var(--hs-text-muted)]" />
+                <Lock className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
               </span>
             )}
             <span
               className={clsx(
-                "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5",
+                "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border",
                 isPublished
-                  ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                  : "bg-[var(--hs-surface-2)] text-[var(--hs-text-muted)] border border-[var(--hs-border)]"
+                  ? "bg-green-500/10 text-green-500 border-green-500/20"
+                  : "bg-[var(--bg-elevated)] text-[var(--text-tertiary)] border-[var(--border-default)]"
               )}
             >
               {isPublished
-                ? <><CheckCircle className="w-3 h-3" /> Live</>
-                : <><XCircle className="w-3 h-3" /> Draft</>}
+                ? <><CheckCircle className="w-3 h-3" />Live</>
+                : <><XCircle className="w-3 h-3" />Draft</>}
             </span>
           </div>
         </div>
 
         <div className="space-y-2 text-xs">
-          <div className="flex justify-between items-baseline border-b border-[var(--hs-border)]/50 pb-2">
-            <span className="text-[var(--hs-text-muted)]">Template</span>
-            <span className="font-mono text-[var(--hs-accent)]">
+          <div className="flex justify-between items-baseline border-b border-[var(--border-faint)] pb-1.5">
+            <span className="text-[var(--text-tertiary)]">Template</span>
+            <span className="font-mono text-[var(--hs-accent)] truncate ml-4">
               {brand.template?.name ?? brand.template_id ?? "—"}
             </span>
           </div>
-          <div className="flex justify-between items-baseline border-b border-[var(--hs-border)]/50 pb-2">
-            <span className="text-[var(--hs-text-muted)]">Version</span>
-            <span className="font-mono text-[var(--hs-text)]">{brand.version}</span>
+          <div className="flex justify-between items-baseline border-b border-[var(--border-faint)] pb-1.5">
+            <span className="text-[var(--text-tertiary)]">Version</span>
+            <span className="font-mono text-[var(--text-primary)]">{brand.version}</span>
           </div>
           <div className="flex justify-between items-baseline">
-            <span className="text-[var(--hs-text-muted)]">Updated</span>
-            <span className="text-[var(--hs-text)]">
+            <span className="text-[var(--text-tertiary)]">Updated</span>
+            <span className="text-[var(--text-primary)]">
               {new Date(brand.updated_at).toLocaleDateString()}
             </span>
           </div>
@@ -135,7 +136,7 @@ function BrandCard({ brand }: { brand: BrandRow }) {
       </div>
 
       {/* Actions */}
-      <div className="px-6 py-4 border-t border-[var(--hs-border)] bg-[var(--hs-bg)]/50 flex items-center gap-3">
+      <div className="px-5 py-3 border-t border-[var(--border-faint)] bg-[var(--bg-subtle)] flex items-center gap-2 flex-wrap">
         <Link
           to={`/assign/${brand.slug}`}
           className="hs-btn hs-btn-secondary !px-3 !py-1.5 !text-[11px]"

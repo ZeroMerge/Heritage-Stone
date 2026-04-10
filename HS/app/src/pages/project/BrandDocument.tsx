@@ -28,7 +28,7 @@ import type {
   Project, SupabaseSectionType, BrandIntroduction, BrandStrategy,
   BrandLogo, BrandTypography, BrandColor, BrandImages, BrandIcons,
   BrandResource, BrandArchetype, LogoVariantType, FontWeight,
-  ColorUsageRole, AccessibilityLevel, IconStyle, Asset, AssetCategory,
+  ColorUsageRole, AccessibilityLevel, IconStyle, AssetCategory,
 } from "@/types";
 import { cn } from "@/lib/utils";
 

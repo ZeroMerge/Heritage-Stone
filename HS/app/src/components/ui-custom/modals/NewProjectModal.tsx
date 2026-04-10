@@ -42,7 +42,7 @@ export function NewProjectModal() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-lg bg-[var(--surface-default)] border border-[var(--border-subtle)] shadow-xl"
+        className="modal-panel w-full max-w-lg"
       >
         <div className="flex items-center justify-between p-6 border-b border-[var(--border-subtle)]">
           <div>
@@ -69,7 +69,7 @@ export function NewProjectModal() {
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Acme Corp"
               className={cn(
-                "w-full px-4 py-2 bg-[var(--bg-primary)] border border-[var(--border-default)]",
+                "w-full px-4 py-2 bg-[var(--surface-default)] border border-[var(--border-default)]",
                 "text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
                 "focus:outline-none focus:border-[var(--hs-accent)]"
               )}
@@ -86,7 +86,7 @@ export function NewProjectModal() {
               onChange={(e) => setIndustry(e.target.value)}
               placeholder="e.g. Technology"
               className={cn(
-                "w-full px-4 py-2 bg-[var(--bg-primary)] border border-[var(--border-default)]",
+                "w-full px-4 py-2 bg-[var(--surface-default)] border border-[var(--border-default)]",
                 "text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
                 "focus:outline-none focus:border-[var(--hs-accent)]"
               )}
@@ -103,7 +103,7 @@ export function NewProjectModal() {
               rows={3}
               placeholder="Brief overview of the project..."
               className={cn(
-                "w-full px-4 py-2 bg-[var(--bg-primary)] border border-[var(--border-default)]",
+                "w-full px-4 py-2 bg-[var(--surface-default)] border border-[var(--border-default)]",
                 "text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
                 "focus:outline-none focus:border-[var(--hs-accent)] resize-none"
               )}

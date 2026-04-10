@@ -11,8 +11,6 @@ import {
   XCircle,
   FileCode,
   Loader2,
-  ArrowRight,
-  ChevronLeft,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -233,7 +231,7 @@ export function UploadTemplate() {
                     <span className={clsx(
                       "flex-1 break-all",
                       log.level === "error" ? "text-red-400" : 
-                      log.level === "success" ? "text-[var(--hs-green)]" : 
+                      log.level === "warn" ? "text-amber-400" : 
                       "text-[var(--hs-text-muted)]"
                     )}>
                       [{new Date(log.timestamp).toLocaleTimeString([], { hour12: false })}] {log.message}

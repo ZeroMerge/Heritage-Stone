@@ -75,28 +75,28 @@ export function TemplateGallery() {
   };
 
   return (
-    <div className="p-8 animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+    <div className="page-pad animate-fade-in">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-semibold text-[var(--hs-text)]">Templates</h1>
-          <p className="text-sm text-[var(--hs-text-muted)] mt-1">
+          <h1 className="heading-lg text-[var(--text-primary)]">Templates</h1>
+          <p className="text-small text-[var(--text-tertiary)] mt-0.5">
             {templates.length} template{templates.length !== 1 ? "s" : ""} registered
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => void load()}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--hs-surface-2)] border border-[var(--hs-border)] text-[var(--hs-text-muted)] hover:text-[var(--hs-text)] rounded transition-colors"
+            className="hs-btn hs-btn-secondary"
           >
             <RefreshCw className={clsx("w-4 h-4", loading && "animate-spin")} />
-            Refresh
+            <span className="sidebar-label">Refresh</span>
           </button>
           <Link
             to="/upload"
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--hs-accent)] text-black font-medium rounded hover:bg-[var(--hs-accent-dim)] transition-colors"
+            className="hs-btn hs-btn-primary"
           >
             <Layers className="w-4 h-4" />
-            Upload New
+            <span className="sidebar-label">Upload New</span>
           </Link>
         </div>
       </div>
@@ -108,9 +108,9 @@ export function TemplateGallery() {
       )}
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="hs-grid">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-64 rounded-lg bg-[var(--hs-surface)] border border-[var(--hs-border)] animate-pulse" />
+            <div key={i} className="h-64 bg-[var(--bg-surface)] border border-[var(--border-default)] animate-pulse" />
           ))}
         </div>
       ) : templates.length === 0 ? (
@@ -120,13 +120,13 @@ export function TemplateGallery() {
           <p className="text-sm">Upload a Vite template zip to get started</p>
           <Link
             to="/upload"
-            className="mt-6 px-5 py-2.5 bg-[var(--hs-accent)] text-black text-sm font-medium rounded hover:bg-[var(--hs-accent-dim)] transition-colors"
+            className="mt-6 hs-btn hs-btn-primary"
           >
             Upload Template
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="hs-grid">
           {templates.map((template) => (
             <div
               key={template.id}

@@ -1,5 +1,6 @@
+// HS/app/src/components/layout/Sidebar.tsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -12,103 +13,113 @@ import {
 import { useUIStore, useAuthStore } from "@/store";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
 
 const navItems = [
-  { path: "/studio", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/studio/projects", label: "Projects", icon: FolderKanban },
-  { path: "/studio/settings", label: "Settings", icon: Settings },
+  { path: "/studio",          label: "Dashboard", icon: LayoutDashboard },
+  { path: "/studio/projects", label: "Projects",  icon: FolderKanban   },
+  { path: "/studio/settings", label: "Settings",  icon: Settings        },
 ];
 
-export function Sidebar() {
+// Sidebar widths per breakpoint
+const getTargetWidth = (collapsed: boolean, isMobile: boolean, isTablet: boolean) => {
+  if (isMobile) return 0;       // Love  — hidden
+  if (isTablet) return 72;      // Cherished — icon only
+  return collapsed ? 72 : 240;  // Goldmine — toggle
+};
+
+export function Sidebar({ className }: { className?: string }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
   const { user, logout } = useAuthStore();
 
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth >= 768 && window.innerWidth < 1280
+  );
+
+  useEffect(() => {
+    const onResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1280);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const handleLogout = () => { logout(); navigate("/login"); };
+
   const isActive = (path: string) => {
-    if (path === "/studio") {
-      return location.pathname === "/studio" || location.pathname === "/studio/";
-    }
+    if (path === "/studio") return location.pathname === "/studio" || location.pathname === "/studio/";
     return location.pathname.startsWith(path);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const targetWidth = getTargetWidth(sidebarCollapsed, isMobile, isTablet);
+  // Labels hidden when icon-only or mobile
+  const labelsHidden = isMobile || isTablet || sidebarCollapsed;
 
   return (
     <motion.aside
+      className={cn("sidebar", className)}
       initial={false}
-      animate={{
-        width: sidebarCollapsed ? 72 : 240,
-      }}
-      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className={cn(
-        "fixed left-0 top-0 h-screen bg-[var(--surface-default)] border-r border-[var(--border-subtle)] z-40 flex flex-col"
-      )}
+      animate={{ width: targetWidth }}
+      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Logo */}
-      <div className="flex items-center h-16 px-4 border-b border-[var(--border-subtle)]">
-        <Link to="/studio" className="flex items-center gap-3 overflow-hidden">
-          <div className="flex-shrink-0 w-9 h-9 bg-[var(--hs-primary)] flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">HS</span>
+      {/* ── Logo ────────────────────────────────────────────── */}
+      <div className="flex items-center h-16 px-4 border-b border-[var(--border-subtle)] shrink-0 overflow-hidden">
+        <Link to="/studio" className="flex items-center gap-3">
+          <img
+            src={isDark ? "/logo/logo-dark.svg" : "/logo/logo-light.svg"}
+            alt="Heritage Stone"
+            className="w-9 h-9 object-contain flex-shrink-0"
+          />
+          <div className={cn("s-label flex flex-col", labelsHidden && "s-label-hidden")}>
+            <span className="text-sm font-semibold text-[var(--text-primary)] whitespace-nowrap">
+              HeritageStone
+            </span>
+            <span className="text-[10px] text-[var(--text-tertiary)] whitespace-nowrap">
+              Ravennorth Studio
+            </span>
           </div>
-          <AnimatePresence>
-            {!sidebarCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col"
-              >
-                <span className="font-semibold text-sm text-[var(--text-primary)] whitespace-nowrap">
-                  HeritageStone
-                </span>
-                <span className="text-[10px] text-[var(--text-tertiary)] whitespace-nowrap">
-                  Ravennorth Studio
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-4 px-2">
+      {/* ── Nav ─────────────────────────────────────────────── */}
+      <nav className="flex-1 py-4 px-2 overflow-y-auto overflow-x-hidden">
         <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
+                  title={labelsHidden ? item.label : undefined}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 transition-all duration-200 group relative",
+                    "flex items-center gap-3 px-3 py-2.5 transition-colors duration-150 group overflow-hidden",
                     active
                       ? "bg-[var(--hs-primary)] text-white"
                       : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                   )}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <AnimatePresence>
-                    {!sidebarCollapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="text-sm font-medium whitespace-nowrap"
-                      >
-                        {item.label}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                  {active && !sidebarCollapsed && (
-                    <ChevronRight className="w-4 h-4 ml-auto opacity-60" />
+                  <span className={cn("s-label text-sm font-medium", labelsHidden && "s-label-hidden")}>
+                    {item.label}
+                  </span>
+                  {active && !labelsHidden && (
+                    <ChevronRight className="w-4 h-4 ml-auto opacity-60 flex-shrink-0" />
                   )}
                 </Link>
               </li>
@@ -117,122 +128,64 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Bottom Actions */}
-      <div className="p-2 border-t border-[var(--border-subtle)] space-y-1">
+      {/* ── Footer ──────────────────────────────────────────── */}
+      <div className="shrink-0 p-2 border-t border-[var(--border-subtle)] space-y-1 overflow-hidden">
         <a
-          href="http://localhost:5174" // Dynamic URL or environment variable preferred
+          href="http://localhost:5174"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-all duration-200"
+          title={labelsHidden ? "Switch to Hub" : undefined}
+          className="flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-colors duration-150"
         >
           <LayoutGrid className="w-5 h-5 flex-shrink-0" />
-          <AnimatePresence>
-            {!sidebarCollapsed && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="text-sm font-medium whitespace-nowrap"
-              >
-                Switch to Hub
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <span className={cn("s-label text-sm font-medium", labelsHidden && "s-label-hidden")}>
+            Switch to Hub
+          </span>
         </a>
-
-        <Link
-          to="/studio/settings"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 transition-all duration-200",
-            isActive("/studio/settings")
-              ? "bg-[var(--surface-subtle)] text-[var(--text-primary)]"
-              : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
-          )}
-        >
-          <Settings className="w-5 h-5 flex-shrink-0" />
-          <AnimatePresence>
-            {!sidebarCollapsed && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="text-sm font-medium whitespace-nowrap"
-              >
-                Settings
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </Link>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-all duration-200"
+          title={labelsHidden ? "Logout" : undefined}
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-colors duration-150"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
-          <AnimatePresence>
-            {!sidebarCollapsed && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="text-sm font-medium whitespace-nowrap"
-              >
-                Logout
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <span className={cn("s-label text-sm font-medium", labelsHidden && "s-label-hidden")}>
+            Logout
+          </span>
         </button>
       </div>
 
-      {/* User Profile */}
-      <div className="p-3 border-t border-[var(--border-subtle)]">
+      {/* ── User Profile ─────────────────────────────────────── */}
+      <div className="shrink-0 p-3 border-t border-[var(--border-subtle)] overflow-hidden">
         <div className="flex items-center gap-3 px-3 py-2 bg-[var(--surface-subtle)]">
-          <Avatar className="w-8 h-8 flex-shrink-0 bg-[var(--hs-accent)] border border-transparent">
+          <Avatar className="w-8 h-8 flex-shrink-0 bg-[var(--hs-accent)]">
             <AvatarFallback className="text-white text-xs font-medium bg-transparent">
-              {user?.firstName?.[0]}
-              {user?.lastName?.[0]}
+              {user?.firstName?.[0]}{user?.lastName?.[0]}
             </AvatarFallback>
           </Avatar>
-          <AnimatePresence>
-            {!sidebarCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col overflow-hidden"
-              >
-                <span className="text-sm font-medium text-[var(--text-primary)] truncate">
-                  {user?.firstName} {user?.lastName}
-                </span>
-                <span className="text-xs text-[var(--text-tertiary)] truncate capitalize">
-                  {user?.role}
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className={cn("s-label flex flex-col overflow-hidden", labelsHidden && "s-label-hidden")}>
+            <span className="text-sm font-medium text-[var(--text-primary)] truncate">
+              {user?.firstName} {user?.lastName}
+            </span>
+            <span className="text-xs text-[var(--text-tertiary)] truncate capitalize">
+              {user?.role}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Collapse Toggle */}
-      <button
-        onClick={toggleSidebar}
-        className={cn(
-          "absolute -right-3 top-20 w-6 h-6",
-          "bg-[var(--surface-default)] border border-[var(--border-default)]",
-          "flex items-center justify-center shadow-sm",
-          "hover:bg-[var(--surface-hover)] transition-colors"
-        )}
-      >
-        {sidebarCollapsed ? (
-          <ChevronRight className="w-3 h-3 text-[var(--text-secondary)]" />
-        ) : (
-          <Menu className="w-3 h-3 text-[var(--text-secondary)]" />
-        )}
-      </button>
+      {/* ── Collapse Toggle (desktop only) ───────────────────── */}
+      {!isMobile && !isTablet && (
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-20 w-6 h-6 bg-[var(--surface-default)] border border-[var(--border-default)] flex items-center justify-center shadow-sm hover:bg-[var(--surface-hover)] transition-colors z-50"
+          title={sidebarCollapsed ? "Expand" : "Collapse"}
+        >
+          {sidebarCollapsed
+            ? <ChevronRight className="w-3 h-3 text-[var(--text-secondary)]" />
+            : <Menu className="w-3 h-3 text-[var(--text-secondary)]" />}
+        </button>
+      )}
     </motion.aside>
   );
 }

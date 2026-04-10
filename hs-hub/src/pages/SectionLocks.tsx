@@ -54,12 +54,14 @@ export function SectionLocks() {
   };
 
   return (
-    <div className="p-12 max-w-4xl animate-fade-in">
-      <div className="mb-12 border-b border-[var(--hs-border)] pb-8">
-        <h1 className="heading-xl text-[var(--hs-text)] mb-2">Section Locks</h1>
-        <p className="text-sm text-[var(--hs-text-muted)]">
-          Prohibit feedback or modifications on specific portal segments.
-        </p>
+    <div className="page-pad-lg animate-fade-in">
+      <div className="page-header" style={{ marginBottom: '2rem' }}>
+        <div>
+          <h1 className="heading-lg text-[var(--text-primary)] mb-1">Section Locks</h1>
+          <p className="text-small text-[var(--text-tertiary)]">
+            Prohibit feedback or modifications on specific portal segments.
+          </p>
+        </div>
       </div>
 
       <div className="flex gap-8 mb-12">
@@ -96,7 +98,7 @@ export function SectionLocks() {
           <span className="text-xs-mono">Synchronizing state…</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="hs-grid-2">
           {ALL_SECTIONS.map((section) => {
             const locked = isLocked(section);
             const lock = getLock(section);
