@@ -1,0 +1,39 @@
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Heritage Stone Specific
+HS/app/node_modules/
+HS/app/dist/
+hs-hub/node_modules/
+hs-hub/dist/
+hs-portal/node_modules/
+hs-portal/dist/
+lint-output.txt
+scratch/

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+templates/*/node_modules/
+templates/*/dist/
+thumbs/
+.env
+*.log
