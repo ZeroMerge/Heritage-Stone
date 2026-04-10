@@ -102,7 +102,7 @@
   /* ── Layout ──────────────────────────────────────────────────────────────── */
   --sidebar-w:      240px;
   --sidebar-w-icon: 60px;
-  --topbar-h:       52px;
+  --topbar-h:       68px;
   --bottomnav-h:    64px;
   --content-max:    1400px;
 }
@@ -402,7 +402,66 @@ select.hs-input { appearance: none; }
 }
 @media (max-width: 767px) { .page-header { margin-bottom: 1rem; } }
 
-/* ─── Responsive grid helpers ────────────────────────────────────────────────── */
+/* ─── Styled Select ─────────────────────────────────────────────────────────── */
+/* Native selects get a consistent themed look across all browsers */
+select, select.hs-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+  cursor: pointer;
+}
+
+select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.dark select, .dark select.hs-input {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+.dark select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* ─── LivePreview responsive header ─────────────────────────────────────────── */
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.preview-selectors {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.preview-selector {
+  flex: 1;
+  min-width: 140px;
+  max-width: 260px;
+}
+
+@media (max-width: 767px) {
+  .preview-header { flex-direction: column; align-items: stretch; padding: 0.75rem; }
+  .preview-selectors { flex-direction: column; }
+  .preview-selector { max-width: 100%; }
+}
 .hs-grid {
   display: grid;
   gap: 1rem;

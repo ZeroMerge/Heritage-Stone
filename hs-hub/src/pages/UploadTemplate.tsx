@@ -92,15 +92,15 @@ export function UploadTemplate() {
   };
 
   return (
-    <div className="p-12 max-w-5xl animate-fade-in">
-       <div className="mb-12 border-b border-[var(--hs-border)] pb-8">
+    <div className="page-pad animate-fade-in">
+       <div className="mb-8 border-b border-[var(--hs-border)] pb-6">
         <h1 className="heading-xl text-[var(--hs-text)] mb-2">Template Ingestion</h1>
         <p className="text-sm text-[var(--hs-text-muted)]">
           Register new high-fidelity design patterns into the Heritage Stone ecosystem.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Control Panel */}
         <div className="space-y-12">
           {/* Metadata */}

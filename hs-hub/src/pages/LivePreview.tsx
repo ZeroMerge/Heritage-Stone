@@ -76,14 +76,14 @@ export function LivePreview() {
   return (
     <div className="h-full flex flex-col animate-fade-in bg-[var(--hs-bg)]">
       {/* Dynamic Header */}
-      <header className="h-20 shrink-0 border-b border-[var(--hs-border)] px-12 flex items-center justify-between gap-8 z-10 bg-[var(--hs-bg)]">
-        <div className="flex items-center gap-12 flex-1">
-          <div className="w-64">
-            <label className="text-xs-mono mb-2 block">Active Entity</label>
+      <header className="preview-header">
+        <div className="preview-selectors">
+          <div className="preview-selector">
+            <label className="text-xs-mono mb-1.5 block">Active Entity</label>
             <select
               value={selectedSlug}
               onChange={(e) => { setSelectedSlug(e.target.value); setIframeLoading(true); }}
-              className="hs-input w-full !bg-[var(--hs-surface)] font-mono"
+              className="hs-input w-full font-mono"
             >
               <option value="">— Choose Brand —</option>
               {brands.map((b) => (
@@ -94,12 +94,12 @@ export function LivePreview() {
             </select>
           </div>
 
-          <div className="w-64">
-             <label className="text-xs-mono mb-2 block">Render Template</label>
+          <div className="preview-selector">
+            <label className="text-xs-mono mb-1.5 block">Render Template</label>
             <select
               value={selectedTemplateId}
               onChange={(e) => { setSelectedTemplateId(e.target.value); setIframeLoading(true); }}
-              className="hs-input w-full !bg-[var(--hs-surface)]"
+              className="hs-input w-full"
             >
               <option value="">— Production Default —</option>
               {templates.map((t) => (
@@ -111,7 +111,7 @@ export function LivePreview() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={refresh}
             className="hs-btn hs-btn-secondary !px-3"

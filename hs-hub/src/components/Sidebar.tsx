@@ -11,6 +11,7 @@ import {
   Activity,
   ChevronDown,
   ChevronRight,
+  Settings,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useEffect, useState } from "react";
@@ -45,25 +46,23 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       {/* ── Logo ─────────────────────────────────────────── */}
-      <div
-        style={{ height: "var(--topbar-h)" }}
-        className="flex items-center px-4 border-b border-[var(--border-default)] shrink-0"
-      >
+      <div className="flex items-center px-4 border-b border-[var(--border-default)] shrink-0" style={{ height: "68px" }}>
         <img
           src={isDark ? "/logo/logo-dark.svg" : "/logo/logo-light.svg"}
           alt="Heritage Stone"
-          className="w-8 h-8 object-contain flex-shrink-0"
+          className="w-9 h-9 object-contain flex-shrink-0"
         />
-        <div className="sidebar-label ml-2.5 flex flex-col">
-          <span className="text-sm font-semibold text-[var(--text-primary)] leading-tight">
+        {/* Name hidden on mobile via sidebar-label — visible on Cherished/Goldmine */}
+        <div className="sidebar-label ml-3 flex flex-col">
+          <span className="text-sm font-semibold text-[var(--text-primary)] leading-tight whitespace-nowrap">
             Heritage <span className="text-[var(--hs-accent)]">Stone</span>
           </span>
-          <span className="section-key mt-0.5">Technical Hub</span>
+          <span className="section-key mt-0.5 whitespace-nowrap">Technical Hub</span>
         </div>
       </div>
 
       {/* ── Nav ──────────────────────────────────────────── */}
-      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 py-4 px-2 space-y-0.5 overflow-y-auto">
         {nav.map(({ to, label, icon: Icon, exact }) => (
           <NavLink
             key={to}
@@ -71,10 +70,7 @@ export function Sidebar() {
             end={exact}
             title={label}
             className={({ isActive }) =>
-              clsx(
-                "nav-item",
-                isActive && "active"
-              )
+              clsx("nav-item", isActive && "active")
             }
           >
             <Icon className="w-4 h-4 shrink-0" />
@@ -83,10 +79,22 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* ── Footer ───────────────────────────────────────── */}
-      <div className="shrink-0 border-t border-[var(--border-default)] px-2 py-2 space-y-1">
+      {/* ── Footer (Settings at bottom, then theme + health) ── */}
+      <div className="shrink-0 border-t border-[var(--border-default)] px-2 py-2 space-y-0.5">
+        {/* Settings nav item */}
+        <NavLink
+          to="/settings"
+          title="Settings"
+          className={({ isActive }) =>
+            clsx("nav-item", isActive && "active")
+          }
+        >
+          <Settings className="w-4 h-4 shrink-0" />
+          <span className="sidebar-label">Settings</span>
+        </NavLink>
+
         {/* Theme toggle row */}
-        <div className="flex items-center justify-between px-2 py-1">
+        <div className="flex items-center justify-between px-3 py-2">
           <span className="sidebar-label section-key">Theme</span>
           <ThemeToggle />
         </div>
@@ -94,7 +102,7 @@ export function Sidebar() {
         {/* System Health — collapsible */}
         <button
           onClick={() => setHealthOpen((o) => !o)}
-          className="w-full flex items-center gap-2 px-2 py-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           title="System Health"
         >
           <Activity className="w-4 h-4 shrink-0" />

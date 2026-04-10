@@ -20,17 +20,14 @@ export function Topbar() {
   }, []);
 
   return (
-    <header className="topbar">
-      {/* Logo */}
+    <header className="topbar" style={{ height: "68px" }}>
+      {/* Logo only on mobile — conserve space */}
       <div className="flex items-center gap-2.5">
         <img
           src={isDark ? "/logo/logo-dark.svg" : "/logo/logo-light.svg"}
           alt="Heritage Stone"
-          className="w-7 h-7 object-contain"
+          className="w-9 h-9 object-contain"
         />
-        <span className="text-sm font-semibold text-[var(--text-primary)]">
-          Heritage <span className="text-[var(--hs-accent)]">Stone</span>
-        </span>
       </div>
 
       {/* Theme toggle */}
