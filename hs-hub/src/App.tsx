@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Sidebar } from "./components/Sidebar.tsx";
 import { BrandList } from "./pages/BrandList.tsx";

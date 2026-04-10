@@ -31,6 +31,7 @@ export type ActivityEventType =
   | "section_revised"
   | "section_updated"
   | "asset_uploaded"
+  | "asset_deleted"
   | "member_invited"
   | "member_removed"
   | "portal_published"

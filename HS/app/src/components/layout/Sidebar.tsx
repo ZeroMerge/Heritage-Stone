@@ -6,12 +6,10 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  Menu,
   LayoutGrid,
 } from "lucide-react";
 import { useUIStore, useAuthStore } from "@/store";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navItems = [
   { path: "/studio", label: "Dashboard", icon: LayoutDashboard },

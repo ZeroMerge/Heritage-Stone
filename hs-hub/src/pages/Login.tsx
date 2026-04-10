@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../store/auth";
-import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import { Lock, ShieldCheck, ArrowRight, Loader2, XCircle } from "lucide-react";
 
 export function Login() {
   const [email, setEmail] = useState("");
