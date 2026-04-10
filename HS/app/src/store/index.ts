@@ -725,6 +725,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
   fetchProjectById: async (id) => {
     try {
+      set({ isLoading: true });
       const { data, error } = await supabase
         .from("brands")
         .select("*")
@@ -736,7 +737,9 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       const project = mapSupabaseProjectToProject(data);
 
       set((state) => ({
-        projects: state.projects.map((p) => (p.id === id ? project : p)),
+        projects: state.projects.find(p => p.id === id) 
+          ? state.projects.map((p) => (p.id === id ? project : p))
+          : [project, ...state.projects],
         selectedProject: project
       }));
 
@@ -749,6 +752,8 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       ]);
     } catch (err) {
       console.error("Error fetching project by id:", err);
+    } finally {
+      set({ isLoading: false });
     }
   },
 

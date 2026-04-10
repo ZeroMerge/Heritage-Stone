@@ -76,14 +76,19 @@ export function ProjectLayout() {
   const [showMobileNav, setShowMobileNav] = useState(false);
 
   const project = projects.find((p) => p.id === projectId);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (projectId && !project) {
-      fetchProjectById(projectId);
-    }
+    const checkProject = async () => {
+      if (projectId && !project) {
+        await fetchProjectById(projectId);
+      }
+      setIsChecking(false);
+    };
+    checkProject();
   }, [projectId, project, fetchProjectById]);
 
-  if (isLoading && !project) {
+  if ((isLoading || isChecking) && !project) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
         <div className="w-12 h-12 border-4 border-[var(--hs-accent)]/20 border-t-[var(--hs-accent)] rounded-full animate-spin" />
