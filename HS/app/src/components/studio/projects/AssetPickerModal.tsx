@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Image as ImageIcon, FileText, Film, Music, Check, Loader2 } from 'lucide-react';
 import { useProjectsStore } from '@/store';
@@ -48,11 +48,11 @@ export function AssetPickerModal({
 
   const CATEGORIES: { id: AssetCategory | 'all'; label: string }[] = [
     { id: 'all', label: 'All Assets' },
-    { id: 'logo', label: 'Logos' },
+    { id: 'brand_logos', label: 'Logos' },
     { id: 'photography', label: 'Photography' },
     { id: 'typography', label: 'Typography' },
-    { id: 'other', label: 'Icons' },
-    { id: 'document', label: 'Guidelines' },
+    { id: 'icons', label: 'Icons' },
+    { id: 'guidelines', label: 'Guidelines' },
     { id: 'other', label: 'Other' },
   ];
 

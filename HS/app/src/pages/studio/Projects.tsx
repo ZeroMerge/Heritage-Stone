@@ -41,18 +41,18 @@ export function Projects() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--hs-text)]">
+          <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
             Projects
           </h1>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--hs-text-muted)] mt-1">
-            Heritage Stone Repository
+          <p className="text-[var(--text-secondary)] mt-1">
+            Manage your brand projects
           </p>
         </div>
         <button
           onClick={() => setNewProjectModalOpen(true)}
-          className="hs-btn"
+          className="btn btn-primary flex items-center gap-2 self-start"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-4 h-4" />
           New Project
         </button>
       </motion.div>
@@ -62,7 +62,7 @@ export function Projects() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="flex flex-col lg:flex-row lg:items-center gap-4 bg-[var(--hs-surface)] border border-[var(--hs-border)] p-4"
+        className="flex flex-col lg:flex-row lg:items-center gap-4"
       >
         <FilterPills
           filters={filters}
@@ -73,13 +73,18 @@ export function Projects() {
         <div className="flex items-center gap-3 ml-auto">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--hs-text-muted)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search projects..."
-              className="hs-input pl-9 w-48 lg:w-64"
+              className={cn(
+                "pl-9 pr-4 py-2 bg-[var(--surface-default)] border border-[var(--border-default)]",
+                "text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
+                "focus:outline-none focus:border-[var(--hs-accent)]",
+                "transition-colors w-48 lg:w-64"
+              )}
             />
           </div>
 

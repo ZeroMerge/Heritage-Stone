@@ -9,7 +9,7 @@ import {
   X,
   Palette,
 } from "lucide-react";
-import { useProjectsStore, useUIStore } from "@/store";
+import { useProjectsStore } from "@/store";
 import { createSubBrand, calculateSubBrandHealthScore } from "@/lib/inheritance";
 import { HealthScoreRing } from "@/components/ui-custom/HealthScoreRing";
 import { EmptyState } from "@/components/ui-custom/EmptyState";

@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Plus, Search, FileText, Settings, Rocket } from "lucide-react";
 import { useUIStore } from "@/store";
 import { useNavigate } from "react-router-dom";

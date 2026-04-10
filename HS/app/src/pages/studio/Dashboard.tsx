@@ -33,11 +33,11 @@ export function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h1 className="text-2xl font-bold tracking-tight text-[var(--hs-text)]">
+        <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
           {greeting}, {firstName}
         </h1>
-        <p className="text-[var(--hs-text-muted)] mt-1 font-mono text-[10px] uppercase tracking-widest">
-          Systems Overview & Project Intelligence
+        <p className="text-[var(--text-secondary)] mt-1">
+          Here is what is happening with your projects today.
         </p>
       </motion.div>
 

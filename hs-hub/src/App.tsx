@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Sidebar } from "./components/Sidebar.tsx";
 import { BrandList } from "./pages/BrandList.tsx";
@@ -11,15 +11,14 @@ import { CacheAdmin } from "./pages/CacheAdmin.tsx";
 import { SectionLocks } from "./pages/SectionLocks.tsx";
 import { Login } from "./pages/Login.tsx";
 import { useAuthStore } from "./store/auth";
-import { useUIStore } from "./store/ui";
 
 function AuthGuard() {
   const { isAuthenticated, isLoading } = useAuthStore();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--hs-bg)]">
-        <div className="w-12 h-12 border-4 border-[var(--hs-accent)]/20 border-t-[var(--hs-accent)] rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="w-12 h-12 border-4 border-[#c9a96e]/20 border-t-[#c9a96e] rounded-full animate-spin" />
       </div>
     );
   }
@@ -33,15 +32,10 @@ function AuthGuard() {
 
 export default function App() {
   const checkSession = useAuthStore((state) => state.checkSession);
-  const theme = useUIStore((state) => state.theme);
 
   useEffect(() => {
     checkSession();
   }, [checkSession]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
 
   return (
     <BrowserRouter>

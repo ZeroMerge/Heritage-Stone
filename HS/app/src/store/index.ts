@@ -93,57 +93,43 @@ interface UIState {
   setProjectFilter: (filter: ProjectStatus | "all") => void;
   setProjectView: (view: "grid" | "list") => void;
   setTheme: (theme: "light" | "dark") => void;
-  toggleTheme: () => void;
   showToast: (message: string, type: "success" | "error" | "info") => void;
   clearToast: () => void;
 }
 
-export const useUIStore = create<UIState>()(
-  persist(
-    (set) => ({
-      sidebarCollapsed: false,
-      activeProjectId: null,
-      activeTab: "overview",
-      isNewProjectModalOpen: false,
-      isInviteModalOpen: false,
-      isPublishModalOpen: false,
-      isSearchModalOpen: false,
-      isConfirmModalOpen: false,
-      confirmModalConfig: null,
-      searchQuery: "",
-      projectFilter: "all",
-      projectView: "grid",
-      theme: "light",
-      toast: null,
+export const useUIStore = create<UIState>((set) => ({
+  sidebarCollapsed: false,
+  activeProjectId: null,
+  activeTab: "overview",
+  isNewProjectModalOpen: false,
+  isInviteModalOpen: false,
+  isPublishModalOpen: false,
+  isSearchModalOpen: false,
+  isConfirmModalOpen: false,
+  confirmModalConfig: null,
+  searchQuery: "",
+  projectFilter: "all",
+  projectView: "grid",
+  theme: "light",
+  toast: null,
 
-      toggleSidebar: () =>
-        set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
-      setActiveProjectId: (id) => set({ activeProjectId: id }),
-      setActiveTab: (tab) => set({ activeTab: tab }),
-      setNewProjectModalOpen: (open) => set({ isNewProjectModalOpen: open }),
-      setInviteModalOpen: (open) => set({ isInviteModalOpen: open }),
-      setPublishModalOpen: (open) => set({ isPublishModalOpen: open }),
-      setSearchModalOpen: (open) => set({ isSearchModalOpen: open }),
-      setConfirmModalOpen: (open) => set({ isConfirmModalOpen: open }),
-      showConfirm: (config) => set({ confirmModalConfig: config, isConfirmModalOpen: true }),
-      setSearchQuery: (query) => set({ searchQuery: query }),
-      setProjectFilter: (filter) => set({ projectFilter: filter }),
-      setProjectView: (view) => set({ projectView: view }),
-      setTheme: (theme) => set({ theme }),
-      toggleTheme: () => set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
-      showToast: (message, type) => set({ toast: { message, type } }),
-      clearToast: () => set({ toast: null }),
-    }),
-    {
-      name: "hs-studio-ui",
-      partialize: (state) => ({ 
-        theme: state.theme, 
-        sidebarCollapsed: state.sidebarCollapsed,
-        projectView: state.projectView
-      }),
-    }
-  )
-);
+  toggleSidebar: () =>
+    set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+  setActiveProjectId: (id) => set({ activeProjectId: id }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
+  setNewProjectModalOpen: (open) => set({ isNewProjectModalOpen: open }),
+  setInviteModalOpen: (open) => set({ isInviteModalOpen: open }),
+  setPublishModalOpen: (open) => set({ isPublishModalOpen: open }),
+  setSearchModalOpen: (open) => set({ isSearchModalOpen: open }),
+  setConfirmModalOpen: (open) => set({ isConfirmModalOpen: open }),
+  showConfirm: (config) => set({ confirmModalConfig: config, isConfirmModalOpen: true }),
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setProjectFilter: (filter) => set({ projectFilter: filter }),
+  setProjectView: (view) => set({ projectView: view }),
+  setTheme: (theme) => set({ theme }),
+  showToast: (message, type) => set({ toast: { message, type } }),
+  clearToast: () => set({ toast: null }),
+}));
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Projects State
@@ -966,7 +952,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   fetchDashboardStats: async () => {
     try {
-      const { data: projects } = await supabase.from("brands").select("id, brand_name, status, is_published, approval_states");
+      const { data: projects } = await supabase.from("brands").select("id, status, is_published, approval_states");
       const { count: unreadCount } = await supabase
         .from("messages")
         .select("*", { count: 'exact', head: true })

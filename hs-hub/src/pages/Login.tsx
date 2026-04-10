@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../store/auth";
-import { Lock, ShieldCheck, ArrowRight, Loader2, XCircle } from "lucide-react";
+import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -81,8 +81,8 @@ export function Login() {
             </div>
 
             {error && (
-              <div className="p-4 bg-[var(--hs-surface)] border border-[var(--hs-border)] text-[var(--hs-text)] text-[11px] font-mono flex items-center gap-3 animate-shake">
-                <XCircle className="w-3.5 h-3.5 shrink-0 text-[var(--hs-accent)]" />
+              <div className="p-4 bg-red-500/5 border border-red-500/20 text-red-500 text-[11px] font-mono flex items-center gap-3 animate-shake">
+                <XCircle className="w-3.5 h-3.5 shrink-0" />
                 {error.toUpperCase()}
               </div>
             )}
@@ -108,7 +108,7 @@ export function Login() {
         </div>
 
         <div className="mt-16 text-center opacity-10">
-           <p className="text-[10px] uppercase tracking-[0.5em] text-[var(--hs-text)]">Encrypted Environment v4.0.1</p>
+           <p className="text-[10px] uppercase tracking-[0.5em] text-white">Encrypted Environment v4.0.1</p>
         </div>
       </div>
     </div>

@@ -7,94 +7,47 @@
 /* ─── Design System ─────────────────────────────────────────────────────────── */
 
 :root {
-  /* Common Design Tokens */
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  
+  /* Brand Colors - HeritageStone */
+  --hs-primary: #0F0F0F;
+  --hs-secondary: #6B7280;
   --hs-accent: #C9A96E;
-  --hs-accent-dim: #A0824E;
   --hs-accent-light: #E8DCC8;
+  
+  /* Background Scale */
+  --bg-primary: #FAFAFA;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  
+  /* Surface Colors */
+  --surface-default: #FFFFFF;
+  --surface-hover: #F9F9F9;
+  --surface-active: #F3F3F3;
+  --surface-subtle: #F5F5F5;
+  
+  /* Border Colors */
+  --border-default: #E5E5E5;
+  --border-subtle: #F0F0F0;
+  --border-strong: #D4D4D4;
+  --border-muted: #E8E8E8;
+  
+  /* Text Colors */
+  --text-primary: #0F0F0F;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-muted: #A1A1AA;
+  --text-inverse: #FFFFFF;
   
   /* Status Colors */
   --status-live: #10B981;
   --status-active: #3B82F6;
   --status-draft: #F59E0B;
   --status-archived: #6B7280;
+  --status-pending: #F59E0B;
+  --status-approved: #10B981;
+  --status-revision: #EF4444;
+  --status-locked: #8B5CF6;
   
-  /* Shared transitions */
-  --transition-base: 220ms ease-out;
-}
-
-.dark {
-  --hs-bg: #0F0F0F;
-  --hs-surface: #141414;
-  --hs-surface-2: #1A1A1A;
-  --hs-border: #2A2A2A;
-  --hs-text: #E5E5E5;
-  --hs-text-muted: #888888;
-  
-  /* Backwards compatibility for Studio-specific vars */
-  --bg-primary: var(--hs-bg);
-  --bg-secondary: var(--hs-surface);
-  --bg-tertiary: var(--hs-surface-2);
-  --border-default: var(--hs-border);
-  --text-primary: var(--hs-text);
-  --text-secondary: var(--hs-text-muted);
-  
-  color-scheme: dark;
-}
-
-:root:not(.dark) {
-  --hs-bg: #FAFAFA;
-  --hs-surface: #FFFFFF;
-  --hs-surface-2: #F5F5F5;
-  --hs-border: #E5E5E5;
-  --hs-text: #1A1A1A;
-  --hs-text-muted: #6B7280;
-
-  /* Backwards compatibility for Studio-specific vars */
-  --bg-primary: var(--hs-bg);
-  --bg-secondary: var(--hs-surface);
-  --bg-tertiary: var(--hs-surface-2);
-  --border-default: var(--hs-border);
-  --text-primary: var(--hs-text);
-  --text-secondary: var(--hs-text-muted);
-  
-  color-scheme: light;
-}
-
-@layer components {
-  .hs-card {
-    @apply bg-[var(--hs-surface)] border border-[var(--hs-border)] transition-all;
-    border-radius: var(--radius-md);
-  }
-
-  .hs-card:hover {
-    @apply border-[#3A3A3A];
-  }
-
-  .hs-btn {
-    @apply px-4 py-2 text-sm font-medium transition-all flex items-center justify-center gap-2;
-    border-radius: var(--radius-sm);
-  }
-
-  .hs-btn-primary {
-    @apply bg-[var(--hs-accent)] text-[var(--hs-bg)] hover:bg-[var(--hs-accent-dim)];
-  }
-
-  .hs-btn-secondary {
-    @apply bg-[var(--hs-surface-2)] border border-[var(--hs-border)] text-[var(--hs-text-muted)] hover:text-[var(--hs-text)] hover:border-[#3A3A3A];
-  }
-
-  .hs-input {
-    @apply bg-[var(--hs-bg)] border border-[var(--hs-border)] text-[var(--hs-text)] px-4 py-2 text-sm focus:outline-none focus:border-[var(--hs-accent)] transition-all;
-    border-radius: var(--radius-sm);
-  }
-}
-:root {
   /* Spacing Scale */
   --space-1: 0.25rem;
   --space-2: 0.5rem;

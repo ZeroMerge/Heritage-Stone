@@ -56,7 +56,7 @@ export function Chat() {
           </div>
         </div>
         <div className="flex-1 p-2">
-          <button className="w-full text-left p-2 rounded-lg bg-[var(--hs-surface)] shadow-sm border border-[var(--border-subtle)] text-sm font-medium text-[var(--text-primary)] mb-2">
+          <button className="w-full text-left p-2 rounded-lg bg-white shadow-sm border border-[var(--border-subtle)] text-sm font-medium text-[var(--text-primary)] mb-2">
             Default Thread
           </button>
           <div className="px-2 py-4 text-xs text-[var(--text-tertiary)] uppercase tracking-widest font-semibold flex items-center justify-between">
@@ -68,7 +68,7 @@ export function Chat() {
       </div>
 
       {/* Main Conversation Area */}
-      <div className="flex-1 flex flex-col bg-[var(--hs-bg)]">
+      <div className="flex-1 flex flex-col bg-white">
         {/* Header */}
         <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-subtle)]">
           <div>
@@ -145,7 +145,7 @@ export function Chat() {
         </div>
 
         {/* Action Bar / Input */}
-        <div className="p-6 bg-[var(--hs-surface)]">
+        <div className="p-6 bg-white">
           <div className="max-w-3xl mx-auto relative">
             <form onSubmit={handleSendMessage} className="relative">
               <textarea

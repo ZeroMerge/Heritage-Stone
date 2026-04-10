@@ -28,7 +28,7 @@ import type {
   Project, SupabaseSectionType, BrandIntroduction, BrandStrategy,
   BrandLogo, BrandTypography, BrandColor, BrandImages, BrandIcons,
   BrandResource, BrandArchetype, LogoVariantType, FontWeight,
-  ColorUsageRole, AccessibilityLevel, IconStyle, AssetCategory,
+  ColorUsageRole, AccessibilityLevel, IconStyle, Asset, AssetCategory,
 } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -234,12 +234,12 @@ function UploadZone({ value, onChange, label, height = 160, accept = "image/*", 
         <AnimatePresence>
           {hovering && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 flex flex-wrap items-center justify-center gap-2 p-2">
-              <label className="flex items-center gap-2 px-3 py-2 bg-[var(--hs-surface)] text-[var(--hs-text)] text-xs cursor-pointer hover:bg-[var(--hs-accent)] transition-colors">
+              <label className="flex items-center gap-2 px-3 py-2 bg-white text-black text-xs cursor-pointer hover:bg-[var(--hs-accent)] transition-colors">
                 <Replace className="w-3.5 h-3.5" /> Replace
                 <input type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
               </label>
               {onLibraryClick && (
-                <button onClick={onLibraryClick} className="flex items-center gap-2 px-3 py-2 bg-[var(--hs-surface)] text-[var(--hs-text)] text-xs hover:bg-[var(--hs-accent)] transition-colors">
+                <button onClick={onLibraryClick} className="flex items-center gap-2 px-3 py-2 bg-white text-black text-xs hover:bg-[var(--hs-accent)] transition-colors">
                   <Library className="w-3.5 h-3.5" /> Library
                 </button>
               )}
@@ -352,7 +352,7 @@ function IntroductionEditor({ data, setData, openAssetPicker }: {
                   value={data.brandMarkUrl || null} 
                   onChange={(v) => set("brandMarkUrl", v)} 
                   height={80}
-                  onLibraryClick={openAssetPicker ? () => openAssetPicker('logo', (url) => set("brandMarkUrl", url)) : undefined}
+                  onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_logos', (url) => set("brandMarkUrl", url)) : undefined}
                 />
               </div>
             </div>
@@ -666,7 +666,7 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
                         value={v.fileUrl || null} 
                         onChange={(val) => updateVariant({ fileUrl: val })} 
                         height={100}
-                        onLibraryClick={openAssetPicker ? () => openAssetPicker('logo', (url) => updateVariant({ fileUrl: url })) : undefined}
+                        onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_logos', (url) => updateVariant({ fileUrl: url })) : undefined}
                       />
                     </div>
                   </div>
@@ -740,7 +740,7 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
                   value={ex.imageUrl || null} 
                   onChange={(v) => { const updated = [...misuse]; updated[i] = { ...ex, imageUrl: v || "" }; set("misuseExamples", updated); }} 
                   height={100} 
-                  onLibraryClick={openAssetPicker ? () => openAssetPicker('logo', (url) => {
+                  onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_logos', (url) => {
                     const updated = [...misuse];
                     updated[i] = { ...ex, imageUrl: url };
                     set("misuseExamples", updated);
@@ -1781,9 +1781,9 @@ function IconsEditor({ data, setData, openAssetPicker }: {
                 <button onClick={() => set("productSymbols", symbols.filter((_, j) => j !== i))} className="p-1 text-[var(--text-tertiary)] hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                <div><FieldLabel>Original</FieldLabel><UploadZone value={sym.originalUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, originalUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('other', (url) => { const u = [...symbols]; u[i] = { ...sym, originalUrl: url }; set("productSymbols", u); }) : undefined} /></div>
-                <div style={{ background: "#111" }}><FieldLabel>Black Version</FieldLabel><UploadZone value={sym.blackUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, blackUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('other', (url) => { const u = [...symbols]; u[i] = { ...sym, blackUrl: url }; set("productSymbols", u); }) : undefined} /></div>
-                <div style={{ background: "#000" }}><FieldLabel>White Version</FieldLabel><UploadZone value={sym.whiteUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, whiteUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('other', (url) => { const u = [...symbols]; u[i] = { ...sym, whiteUrl: url }; set("productSymbols", u); }) : undefined} /></div>
+                <div><FieldLabel>Original</FieldLabel><UploadZone value={sym.originalUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, originalUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => { const u = [...symbols]; u[i] = { ...sym, originalUrl: url }; set("productSymbols", u); }) : undefined} /></div>
+                <div style={{ background: "#111" }}><FieldLabel>Black Version</FieldLabel><UploadZone value={sym.blackUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, blackUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => { const u = [...symbols]; u[i] = { ...sym, blackUrl: url }; set("productSymbols", u); }) : undefined} /></div>
+                <div style={{ background: "#000" }}><FieldLabel>White Version</FieldLabel><UploadZone value={sym.whiteUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, whiteUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => { const u = [...symbols]; u[i] = { ...sym, whiteUrl: url }; set("productSymbols", u); }) : undefined} /></div>
               </div>
             </div>
           ))}
@@ -1807,7 +1807,7 @@ function IconsEditor({ data, setData, openAssetPicker }: {
             </div>
           </div>
           <div><FieldLabel>Library Description</FieldLabel><TextArea value={data.iconLibraryDescription || ""} onChange={(v) => set("iconLibraryDescription", v)} placeholder="Describe how this library should be used..." rows={3} /></div>
-          <div><FieldLabel hint="Upload a preview showing the icon set">Library Preview</FieldLabel><UploadZone value={data.iconLibraryPreviewUrl || null} onChange={(v) => set("iconLibraryPreviewUrl", v)} height={120} onLibraryClick={openAssetPicker ? () => openAssetPicker('other', (url) => set("iconLibraryPreviewUrl", url)) : undefined} /></div>
+          <div><FieldLabel hint="Upload a preview showing the icon set">Library Preview</FieldLabel><UploadZone value={data.iconLibraryPreviewUrl || null} onChange={(v) => set("iconLibraryPreviewUrl", v)} height={120} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => set("iconLibraryPreviewUrl", url)) : undefined} /></div>
         </div>
       </Accordion>
     </div>
@@ -1839,7 +1839,7 @@ function ResourceCard({ resource, onChange, onRemove, openAssetPicker }: {
             value={resource.thumbnailUrl || null} 
             onChange={(v) => set("thumbnailUrl", v)} 
             height={130} 
-            onLibraryClick={openAssetPicker ? () => openAssetPicker('document', (url) => set("thumbnailUrl", url)) : undefined}
+            onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_resources', (url) => set("thumbnailUrl", url)) : undefined}
           />
         </div>
         <div className="p-3 space-y-2">
@@ -1855,7 +1855,7 @@ function ResourceCard({ resource, onChange, onRemove, openAssetPicker }: {
               className="w-full pl-9 pr-12 py-2.5 bg-[var(--bg-primary)] border border-[var(--border-default)] text-sm focus:outline-none focus:border-[var(--hs-accent)] placeholder:italic placeholder:text-[var(--text-muted)]" />
             {openAssetPicker && (
               <button 
-                onClick={() => openAssetPicker('document', (url) => set("fileUrl", url))}
+                onClick={() => openAssetPicker('brand_resources', (url) => set("fileUrl", url))}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[var(--text-tertiary)] hover:text-[var(--hs-accent)] transition-colors"
                 title="Select from Library"
               >

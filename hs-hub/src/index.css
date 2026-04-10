@@ -5,40 +5,24 @@
 @tailwind utilities;
 
 :root {
-  /* Common Design Tokens */
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --hs-accent: #C9A96E;
-  --hs-accent-dim: #A0824E;
-  --hs-red: #FA5252;
-  --hs-green: #51CF66;
-  
-  /* Shared transitions */
-  --transition-base: 220ms ease-out;
-}
-
-/* Theme-Specific Tokens */
-.dark {
+  /* Heritage Stone Design Tokens (Hardened) */
   --hs-bg: #0F0F0F;
   --hs-surface: #141414;
   --hs-surface-2: #1A1A1A;
   --hs-border: #2A2A2A;
   --hs-text: #E5E5E5;
   --hs-text-muted: #888888;
-  color-scheme: dark;
-}
-
-:root:not(.dark) {
-  --hs-bg: #FFFFFF;
-  --hs-surface: #F8F8F8;
-  --hs-surface-2: #F0F0F0;
-  --hs-border: #E0E0E0;
-  --hs-text: #1A1A1A;
-  --hs-text-muted: #666666;
-  color-scheme: light;
+  --hs-accent: #C9A96E;
+  --hs-accent-dim: #A0824E;
+  --hs-red: #FA5252;
+  --hs-green: #51CF66;
+  
+  /* Layout & Scaling */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
 }
 
 * {

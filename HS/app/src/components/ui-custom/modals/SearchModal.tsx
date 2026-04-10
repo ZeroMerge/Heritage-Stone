@@ -1,11 +1,13 @@
 import { useState, useMemo } from "react";
 import { Search, FolderKanban, ChevronRight, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
 import { useUIStore, useProjectsStore } from "@/store";
+import { cn } from "@/lib/utils";
 
 export function SearchModal() {
   const navigate = useNavigate();

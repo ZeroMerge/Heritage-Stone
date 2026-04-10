@@ -10,7 +10,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { clsx } from "clsx";
-import { ThemeToggle } from "./ThemeToggle";
 
 const nav = [
   { to: "/", label: "Brands", icon: List, exact: true },
@@ -25,16 +24,13 @@ export function Sidebar() {
   return (
     <aside className="w-64 shrink-0 flex flex-col border-r border-[var(--hs-border)] bg-[var(--hs-bg)]">
       {/* Brand Header */}
-      <div className="h-20 flex items-center justify-between px-6 border-b border-[var(--hs-border)]/50">
-        <div className="flex flex-col">
-          <span className="text-xl font-light tracking-tight text-[var(--hs-text)]">
-            Heritage <span className="text-[var(--hs-accent)]">Stone</span>
-          </span>
-          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--hs-text-muted)] mt-1">
-            Technical Hub
-          </span>
-        </div>
-        <ThemeToggle />
+      <div className="h-20 flex flex-col justify-center px-8 border-b border-[var(--hs-border)]/50">
+        <span className="text-xl font-light tracking-tight text-[var(--hs-text)]">
+          Heritage <span className="text-[var(--hs-accent)]">Stone</span>
+        </span>
+        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--hs-text-muted)] mt-1">
+          Technical Hub
+        </span>
       </div>
 
       {/* Primary Navigation */}

@@ -11,6 +11,8 @@ import {
   XCircle,
   FileCode,
   Loader2,
+  ArrowRight,
+  ChevronLeft,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -214,7 +216,7 @@ export function UploadTemplate() {
             )}
           </div>
           
-          <div className="hs-card bg-[var(--hs-bg)] border-[var(--hs-border)] flex-1 min-h-[500px] flex flex-col font-mono text-[11px] overflow-hidden">
+          <div className="hs-card bg-[#0A0A0A] border-[var(--hs-border)] flex-1 min-h-[500px] flex flex-col font-mono text-[11px] overflow-hidden">
             <div 
               ref={logContainerRef}
               className="flex-1 overflow-y-auto p-8 space-y-1.5 scrollbar-thin scrollbar-thumb-[var(--hs-border)] scrollbar-track-transparent"
@@ -231,7 +233,7 @@ export function UploadTemplate() {
                     <span className={clsx(
                       "flex-1 break-all",
                       log.level === "error" ? "text-red-400" : 
-                      log.level === "warn" ? "text-yellow-400" : 
+                      log.level === "success" ? "text-[var(--hs-green)]" : 
                       "text-[var(--hs-text-muted)]"
                     )}>
                       [{new Date(log.timestamp).toLocaleTimeString([], { hour12: false })}] {log.message}

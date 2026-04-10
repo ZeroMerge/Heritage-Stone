@@ -4,7 +4,6 @@ import { Search, Bell, Menu, ChevronDown, User, Settings, LogOut } from "lucide-
 import { motion, AnimatePresence } from "framer-motion";
 import { useUIStore, useAuthStore, useDocumentEditorStore } from "@/store";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "./ThemeToggle";
 
 export function Topbar() {
   const location = useLocation();
@@ -57,8 +56,6 @@ export function Topbar() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
-        <ThemeToggle />
-        
         {/* Search */}
         <button className="p-2 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-colors">
           <Search className="w-5 h-5" />

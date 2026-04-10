@@ -6,10 +6,12 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Menu,
   LayoutGrid,
 } from "lucide-react";
 import { useUIStore, useAuthStore } from "@/store";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navItems = [
   { path: "/studio", label: "Dashboard", icon: LayoutDashboard },
@@ -43,14 +45,14 @@ export function Sidebar() {
       }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       className={cn(
-        "fixed left-0 top-0 h-screen bg-[var(--hs-bg)] border-r border-[var(--hs-border)] z-40 flex flex-col"
+        "fixed left-0 top-0 h-screen bg-[var(--surface-default)] border-r border-[var(--border-subtle)] z-40 flex flex-col"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center h-20 px-4 border-b border-[var(--hs-border)]/50">
+      <div className="flex items-center h-16 px-4 border-b border-[var(--border-subtle)]">
         <Link to="/studio" className="flex items-center gap-3 overflow-hidden">
-          <div className="flex-shrink-0 w-10 h-10 bg-[var(--hs-primary)] flex items-center justify-center">
-            <span className="text-white font-bold text-sm tracking-tighter">HS</span>
+          <div className="flex-shrink-0 w-9 h-9 bg-[var(--hs-primary)] flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">HS</span>
           </div>
           <AnimatePresence>
             {!sidebarCollapsed && (
@@ -61,11 +63,11 @@ export function Sidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex flex-col"
               >
-                <span className="text-sm font-semibold tracking-tight text-[var(--hs-text)] whitespace-nowrap">
-                  Heritage <span className="text-[var(--hs-accent)]">Stone</span>
+                <span className="font-semibold text-sm text-[var(--text-primary)] whitespace-nowrap">
+                  HeritageStone
                 </span>
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--hs-text-muted)] whitespace-nowrap">
-                  Studio Portal
+                <span className="text-[10px] text-[var(--text-tertiary)] whitespace-nowrap">
+                  Ravennorth Studio
                 </span>
               </motion.div>
             )}
@@ -74,8 +76,8 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-8 px-3">
-        <ul className="space-y-1.5">
+      <nav className="flex-1 py-4 px-2">
+        <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -85,13 +87,13 @@ export function Sidebar() {
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-3 transition-all duration-300 group relative",
+                    "flex items-center gap-3 px-3 py-2.5 transition-all duration-200 group relative",
                     active
-                      ? "bg-[var(--hs-surface)] border border-[var(--hs-border)] text-[var(--hs-accent)]"
-                      : "text-[var(--hs-text-muted)] border border-transparent hover:border-[var(--hs-border)]/50 hover:text-[var(--hs-text)]"
+                      ? "bg-[var(--hs-primary)] text-white"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                   )}
                 >
-                  <Icon className={cn("w-4 h-4 flex-shrink-0 transition-colors", active ? "text-[var(--hs-accent)]" : "")} />
+                  <Icon className="w-5 h-5 flex-shrink-0" />
                   <AnimatePresence>
                     {!sidebarCollapsed && (
                       <motion.span
@@ -99,14 +101,14 @@ export function Sidebar() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="text-sm tracking-tight whitespace-nowrap"
+                        className="text-sm font-medium whitespace-nowrap"
                       >
                         {item.label}
                       </motion.span>
                     )}
                   </AnimatePresence>
                   {active && !sidebarCollapsed && (
-                    <div className="absolute right-3 w-1.5 h-1.5 bg-[var(--hs-accent)]" />
+                    <ChevronRight className="w-4 h-4 ml-auto opacity-60" />
                   )}
                 </Link>
               </li>
@@ -116,14 +118,14 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="p-3 border-t border-[var(--hs-border)]/50 space-y-1.5">
+      <div className="p-2 border-t border-[var(--border-subtle)] space-y-1">
         <a
-          href="http://localhost:5174"
+          href="http://localhost:5174" // Dynamic URL or environment variable preferred
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-3 py-3 text-[var(--hs-text-muted)] border border-transparent hover:border-[var(--hs-border)]/50 hover:text-[var(--hs-text)] transition-all duration-300"
+          className="flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-all duration-200"
         >
-          <LayoutGrid className="w-4 h-4 flex-shrink-0" />
+          <LayoutGrid className="w-5 h-5 flex-shrink-0" />
           <AnimatePresence>
             {!sidebarCollapsed && (
               <motion.span
@@ -131,7 +133,7 @@ export function Sidebar() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
-                className="text-sm tracking-tight whitespace-nowrap"
+                className="text-sm font-medium whitespace-nowrap"
               >
                 Switch to Hub
               </motion.span>
@@ -139,11 +141,16 @@ export function Sidebar() {
           </AnimatePresence>
         </a>
 
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-3 text-[var(--hs-text-muted)] border border-transparent hover:border-[var(--hs-border)]/50 hover:text-[var(--hs-text)] transition-all duration-300 group"
+        <Link
+          to="/studio/settings"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2.5 transition-all duration-200",
+            isActive("/studio/settings")
+              ? "bg-[var(--surface-subtle)] text-[var(--text-primary)]"
+              : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
+          )}
         >
-          <LogOut className="w-4 h-4 flex-shrink-0 group-hover:text-red-500 transition-colors" />
+          <Settings className="w-5 h-5 flex-shrink-0" />
           <AnimatePresence>
             {!sidebarCollapsed && (
               <motion.span
@@ -151,7 +158,27 @@ export function Sidebar() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
-                className="text-sm tracking-tight whitespace-nowrap group-hover:text-red-500"
+                className="text-sm font-medium whitespace-nowrap"
+              >
+                Settings
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-all duration-200"
+        >
+          <LogOut className="w-5 h-5 flex-shrink-0" />
+          <AnimatePresence>
+            {!sidebarCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                className="text-sm font-medium whitespace-nowrap"
               >
                 Logout
               </motion.span>
@@ -161,14 +188,14 @@ export function Sidebar() {
       </div>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-[var(--hs-border)]/50">
-        <div className="flex items-center gap-3 px-3 py-2.5 bg-[var(--hs-surface)] border border-[var(--hs-border)]">
-          <div className="w-8 h-8 flex-shrink-0 bg-[var(--hs-accent)] flex items-center justify-center border border-white/10">
-            <span className="text-white text-[10px] font-bold">
+      <div className="p-3 border-t border-[var(--border-subtle)]">
+        <div className="flex items-center gap-3 px-3 py-2 bg-[var(--surface-subtle)]">
+          <Avatar className="w-8 h-8 flex-shrink-0 bg-[var(--hs-accent)] border border-transparent">
+            <AvatarFallback className="text-white text-xs font-medium bg-transparent">
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
-            </span>
-          </div>
+            </AvatarFallback>
+          </Avatar>
           <AnimatePresence>
             {!sidebarCollapsed && (
               <motion.div
@@ -178,10 +205,10 @@ export function Sidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex flex-col overflow-hidden"
               >
-                <span className="text-[11px] font-bold text-[var(--hs-text)] truncate tracking-tight uppercase">
+                <span className="text-sm font-medium text-[var(--text-primary)] truncate">
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className="text-[9px] font-mono text-[var(--hs-text-muted)] tracking-widest uppercase truncate">
+                <span className="text-xs text-[var(--text-tertiary)] truncate capitalize">
                   {user?.role}
                 </span>
               </motion.div>
@@ -194,13 +221,17 @@ export function Sidebar() {
       <button
         onClick={toggleSidebar}
         className={cn(
-          "absolute -right-3 top-24 w-6 h-6",
-          "bg-[var(--hs-bg)] border border-[var(--hs-border)]",
-          "flex items-center justify-center shadow-md z-50",
-          "hover:bg-[var(--hs-surface)] transition-colors"
+          "absolute -right-3 top-20 w-6 h-6",
+          "bg-[var(--surface-default)] border border-[var(--border-default)]",
+          "flex items-center justify-center shadow-sm",
+          "hover:bg-[var(--surface-hover)] transition-colors"
         )}
       >
-        <ChevronRight className={cn("w-3 h-3 text-[var(--hs-text-muted)] transition-transform duration-300", sidebarCollapsed ? "" : "rotate-180")} />
+        {sidebarCollapsed ? (
+          <ChevronRight className="w-3 h-3 text-[var(--text-secondary)]" />
+        ) : (
+          <Menu className="w-3 h-3 text-[var(--text-secondary)]" />
+        )}
       </button>
     </motion.aside>
   );

@@ -1,7 +1,7 @@
 // hs-hub/src/pages/CacheAdmin.tsx
 import { useEffect, useState } from "react";
 import { cacheApi, type CacheStats } from "../lib/api.ts";
-import { Database, RefreshCw, Loader2, XCircle } from "lucide-react";
+import { Database, Trash2, RefreshCw, Loader2 } from "lucide-react";
 import { clsx } from "clsx";
 
 export function CacheAdmin() {

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
@@ -9,11 +8,7 @@ import { SearchModal } from "@/components/ui-custom/modals/SearchModal";
 import { ConfirmModal } from "@/components/ui-custom/modals/ConfirmModal";
 
 export function Layout() {
-  const { sidebarCollapsed, theme } = useUIStore();
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+  const { sidebarCollapsed } = useUIStore();
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
