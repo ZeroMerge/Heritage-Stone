@@ -6,11 +6,12 @@ interface StatusBadgeProps {
   size?: "sm" | "md";
 }
 
-const statusStyles: Record<ProjectStatus, string> = {
-  live: "bg-emerald-100 text-emerald-700",
-  active: "bg-blue-100 text-blue-700",
-  draft: "bg-amber-100 text-amber-700",
-  archived: "bg-gray-100 text-gray-700",
+// Using inline styles tied to CSS vars so the badge responds to any theme switch
+const statusVars: Record<ProjectStatus, { bg: string; color: string }> = {
+  live:     { bg: "rgba(16,185,129,0.15)",  color: "var(--status-live)"     },
+  active:   { bg: "rgba(59,130,246,0.15)",  color: "var(--status-active)"   },
+  draft:    { bg: "rgba(245,158,11,0.15)",  color: "var(--status-draft)"    },
+  archived: { bg: "rgba(107,114,128,0.15)", color: "var(--status-archived)" },
 };
 
 const sizeStyles = {
@@ -19,13 +20,14 @@ const sizeStyles = {
 };
 
 export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
+  const { bg, color } = statusVars[status] ?? statusVars.draft;
   return (
     <span
       className={cn(
         "inline-flex items-center font-medium rounded-full capitalize",
-        statusStyles[status],
         sizeStyles[size]
       )}
+      style={{ background: bg, color }}
     >
       {status}
     </span>

@@ -168,7 +168,7 @@ function NumberInput({ value, onChange, min, max, step = 1, unit }: {
 
 function TagChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[var(--hs-primary)] text-white text-xs font-medium">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] text-xs font-medium">
       {label}
       <button onClick={onRemove} className="hover:opacity-70 transition-opacity"><X className="w-3 h-3" /></button>
     </span>
@@ -554,7 +554,7 @@ function StrategyEditor({ data, setData, openAssetPicker }: {
                   className={cn(
                     "p-3 border text-left transition-all",
                     personality.archetype === id
-                      ? "border-[var(--hs-primary)] bg-[var(--hs-primary)] text-white"
+                      ? "border-[var(--hs-primary)] bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f]"
                       : "border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--surface-default)]"
                   )}
                 >
@@ -712,7 +712,7 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
                       const current = logo.safeFormats || [];
                       set("safeFormats", isSelected ? current.filter((f) => f !== fmt) : [...current, fmt]);
                     }} className={cn("px-3 py-1.5 text-xs font-mono font-medium border transition-all",
-                      isSelected ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
+                      isSelected ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
                     )}>
                       .{fmt}
                     </button>
@@ -990,7 +990,7 @@ function ColorCard({ color, onChange, onRemove }: {
               {(["primary", "secondary", "neutral"] as const).map((t) => (
                 <button key={t} onClick={() => set("paletteType", t)}
                   className={cn("flex-1 py-2 text-xs font-medium capitalize border-y first:border-l last:border-r border-[var(--border-default)] transition-all",
-                    color.paletteType === t ? "bg-[var(--hs-primary)] text-white border-[var(--hs-primary)]" : "bg-[var(--surface-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)]"
+                    color.paletteType === t ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] border-[var(--hs-primary)]" : "bg-[var(--surface-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)]"
                   )}>
                   {t}
                 </button>
@@ -1062,7 +1062,7 @@ function ColorCard({ color, onChange, onRemove }: {
             {(["AA", "AAA", "decorative"] as AccessibilityLevel[]).map((level) => (
               <button key={level} onClick={() => set("accessibilityLevel", level)}
                 className={cn("flex-1 py-2 text-xs font-medium border transition-all",
-                  color.accessibilityLevel === level ? "bg-[var(--hs-primary)] text-white border-[var(--hs-primary)]" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
+                  color.accessibilityLevel === level ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] border-[var(--hs-primary)]" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
                 )}>
                 {level}
               </button>
@@ -1391,7 +1391,7 @@ function TypographyCard({ font, onChange, onRemove }: {
               return (
                 <button key={value} onClick={() => set("weights", isSelected ? weights.filter((w) => w !== value) : [...weights, value].sort())}
                   className={cn("px-3 py-1.5 text-xs border transition-all",
-                    isSelected ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
+                    isSelected ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
                   )}>
                   {label}
                 </button>
@@ -1580,7 +1580,7 @@ function ImagesEditor({ data, setData, openAssetPicker }: {
                     const current = data.photographyStyle || [];
                     set("photographyStyle", selected ? current.filter((t) => t !== tag) : [...current, tag]);
                   }} className={cn("px-2.5 py-1.5 text-xs border transition-all",
-                    selected ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
+                    selected ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
                   )}>
                     {tag.replace(/_/g, " ")}
                   </button>
@@ -1733,10 +1733,10 @@ function IconsEditor({ data, setData, openAssetPicker }: {
               {ICON_STYLE_OPTIONS.map(({ id, label, description }) => (
                 <button key={id} onClick={() => set("iconStyle", data.iconStyle === id ? null : id)}
                   className={cn("p-3 border text-left transition-all",
-                    data.iconStyle === id ? "border-[var(--hs-primary)] bg-[var(--hs-primary)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--surface-default)]"
+                    data.iconStyle === id ? "border-[var(--hs-primary)] bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" : "border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--surface-default)]"
                   )}>
                   <p className="font-medium text-xs">{label}</p>
-                  <p className={cn("text-xs mt-0.5", data.iconStyle === id ? "text-white/70" : "text-[var(--text-tertiary)]")}>{description}</p>
+                  <p className={cn("text-xs mt-0.5", data.iconStyle === id ? "text-white/70 dark:text-black/60" : "text-[var(--text-tertiary)]")}>{description}</p>
                 </button>
               ))}
             </div>
@@ -1942,10 +1942,10 @@ function VoiceToneEditor({ data, setData }: { data: Partial<BrandStrategy>; setD
                 <button key={id}
                   onClick={() => set("brandPersonality", { ...personality, archetype: personality.archetype === id ? null : id })}
                   className={cn("p-3 border text-left transition-all",
-                    personality.archetype === id ? "border-[var(--hs-primary)] bg-[var(--hs-primary)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--surface-default)]"
+                    personality.archetype === id ? "border-[var(--hs-primary)] bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" : "border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--surface-default)]"
                   )}>
                   <p className="font-medium text-sm">{id}</p>
-                  <p className={cn("text-xs mt-0.5", personality.archetype === id ? "text-white/70" : "text-[var(--text-tertiary)]")}>{description}</p>
+                  <p className={cn("text-xs mt-0.5", personality.archetype === id ? "text-white/70 dark:text-black/60" : "text-[var(--text-tertiary)]")}>{description}</p>
                 </button>
               ))}
             </div>
@@ -2134,41 +2134,91 @@ export function BrandDocument() {
 
   return (
     /**
-     * Responsive layout strategy:
-     * - Mobile  (<md): sidebar as fixed drawer overlay, triggered by hamburger
-     * - Tablet  (md):  sidebar collapses to icon-only strip (w-14)
-     * - Desktop (lg+): full w-60 sidebar always visible
+     * Responsive layout:
+     * - Mobile  (<md): horizontal scroll section strip at top, no sidebar
+     * - Tablet  (md):  icon-only sidebar (w-14)
+     * - Desktop (lg+): full w-60 sidebar
      */
-    <div className="flex h-[calc(100vh-var(--studio-topbar-height,64px))] min-h-[500px] relative">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-var(--studio-topbar-height,64px))] min-h-[500px] relative">
 
-      {/* ── Mobile sidebar overlay backdrop ─────────────────────────────────── */}
+      {/* ── Mobile bottom-sheet nav trigger (hidden md+) ──────────────── */}
+      {/* Floating pill at the bottom of the editor — tapping opens the full section sheet */}
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="md:hidden absolute inset-0 bg-black/50 z-40"
             onClick={() => setSidebarOpen(false)}
           />
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 350 }}
+            className="md:hidden absolute bottom-0 left-0 right-0 z-50 bg-[var(--surface-default)] border-t border-[var(--border-subtle)] rounded-t-2xl shadow-2xl max-h-[70%] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)] sticky top-0 bg-[var(--surface-default)] z-10">
+              <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)]">Sections</span>
+              <button onClick={() => setSidebarOpen(false)} className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-2 grid grid-cols-2 gap-1">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                const isActive = activeSection === section.id;
+                const completion = sectionCompletion(section.id, sectionData[section.id]);
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => { setActiveSection(section.id); setSidebarOpen(false); }}
+                    className={cn(
+                      "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-left transition-all",
+                      isActive
+                        ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f]"
+                        : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)]"
+                    )}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="font-medium truncate flex-1">{section.label}</span>
+                    {completion === 100 && (
+                      <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", isActive ? "bg-emerald-300" : "bg-emerald-500")} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Completion bar */}
+            <div className="px-4 pb-4 pt-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs text-[var(--text-tertiary)]">Document completion</span>
+                <span className="text-xs font-semibold text-[var(--text-primary)]">{completionPct}%</span>
+              </div>
+              <div className="h-1.5 bg-[var(--border-subtle)] rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-[var(--hs-accent)] rounded-full"
+                  animate={{ width: `${completionPct}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ── Left Navigation Sidebar ──────────────────────────────────────────── */}
-      {/*
-        Mobile: fixed off-canvas drawer (z-50)
-        md: inline collapsed icon-strip
-        lg: full sidebar
-      */}
+      {/* ── Left Navigation Sidebar (md+ only) ──────────────────────────────── */}
       <motion.aside
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.25 }}
         className={cn(
-          // Base
-          "bg-[var(--surface-default)] border-r border-[var(--border-subtle)] flex-col flex-shrink-0 flex",
-          // Mobile: off-canvas drawer
-          "fixed inset-y-0 left-0 z-50 w-64 transition-transform duration-300 md:static md:z-auto md:translate-x-0 md:inset-auto",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
-          // Responsive widths
+          "hidden md:flex bg-[var(--surface-default)] border-r border-[var(--border-subtle)] flex-col flex-shrink-0",
           "md:w-14 lg:w-60"
         )}
       >
@@ -2195,7 +2245,7 @@ export function BrandDocument() {
                 title={section.label}
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all group",
-                  isActive ? "bg-[var(--hs-primary)] text-white" : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
+                  isActive ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                 )}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
@@ -2231,10 +2281,14 @@ export function BrandDocument() {
 
         {/* Editor Topbar */}
         <div className="flex items-center justify-between px-3 sm:px-5 py-3 bg-[var(--surface-default)] border-b border-[var(--border-subtle)] flex-shrink-0 gap-2">
-          {/* Left: hamburger (mobile) + breadcrumb */}
+          {/* Left: mobile hamburger + breadcrumb */}
           <div className="flex items-center gap-2 min-w-0">
-            {/* Hamburger — mobile + md only */}
-            <button onClick={() => setSidebarOpen(true)} className="p-1.5 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors lg:hidden flex-shrink-0">
+            {/* Mobile: opens bottom-sheet section picker */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors flex-shrink-0"
+              title="Switch section"
+            >
               <Menu className="w-4 h-4" />
             </button>
             <span className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider hidden sm:block">Document</span>
@@ -2255,15 +2309,15 @@ export function BrandDocument() {
           </div>
 
           {/* Right: action buttons */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <button onClick={handleSave} disabled={!unsavedChanges}
-              className={cn("flex items-center gap-1.5 px-3 py-2 text-sm border border-[var(--border-default)] bg-[var(--surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors",
+              className={cn("flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg border border-[var(--border-default)] bg-[var(--surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors",
                 !unsavedChanges && "opacity-40 cursor-not-allowed"
               )}>
               <Save className="w-3.5 h-3.5" />
               <span className="hidden sm:block">Save</span>
             </button>
-            <button onClick={handlePublish} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-[var(--hs-primary)] text-white hover:opacity-90 transition-opacity">
+            <button onClick={handlePublish} className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm rounded-lg bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] hover:opacity-90 transition-opacity">
               <Zap className="w-3.5 h-3.5" />
               <span className="hidden sm:block">Publish</span>
             </button>

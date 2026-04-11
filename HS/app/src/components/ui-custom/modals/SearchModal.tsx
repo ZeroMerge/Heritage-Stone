@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, FolderKanban, ChevronRight, X } from "lucide-react";
+import { Search, FolderKanban, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -49,12 +49,7 @@ export function SearchModal() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button 
-            onClick={() => setSearchModalOpen(false)}
-            className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <kbd className="px-2 py-1 text-[10px] text-[var(--text-tertiary)] bg-[var(--surface-subtle)] border border-[var(--border-default)] font-mono">ESC</kbd>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto p-2">

@@ -1,22 +1,23 @@
 import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 
+const STORAGE_KEY = "hs-hub-theme";
+
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true); // Hub defaults dark
+  const [isDark, setIsDark] = useState(() => {
+    // Hub defaults to LIGHT; only go dark if user previously chose dark
+    const stored = typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
+    return stored === "dark";
+  });
 
   useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
-  const toggle = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-  };
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
+  }, [isDark]);
 
   return (
     <button
-      onClick={toggle}
+      onClick={() => setIsDark((v) => !v)}
       className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors"
       title="Toggle Theme"
     >

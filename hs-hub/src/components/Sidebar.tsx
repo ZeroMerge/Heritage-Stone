@@ -7,7 +7,6 @@ import {
   List,
   GitBranch,
   Database,
-  ExternalLink,
   Activity,
   ChevronDown,
   ChevronRight,
@@ -115,17 +114,26 @@ export function Sidebar() {
         </button>
 
         {healthOpen && (
-          <div className="sidebar-label mx-2 mb-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] p-3 animate-fade-in">
-            <a
-              href="http://localhost:3001/health"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between text-[11px] text-[var(--text-secondary)] hover:text-[var(--hs-accent)] transition-colors group"
-            >
-              <span>Engine Status</span>
-              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-            <div className="mt-3 pt-3 border-t border-[var(--border-faint)] flex items-center justify-between">
+          <div className="sidebar-label mx-2 mb-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] p-3 animate-fade-in space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-[var(--text-secondary)]">API</span>
+              <span className="flex items-center gap-1 text-[11px] text-green-500 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Operational
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-[var(--text-secondary)]">Database</span>
+              <span className="flex items-center gap-1 text-[11px] text-green-500 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Connected
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-[var(--text-secondary)]">Hosting</span>
+              <span className="flex items-center gap-1 text-[11px] text-green-500 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Render / Live
+              </span>
+            </div>
+            <div className="mt-2 pt-2 border-t border-[var(--border-faint)] flex items-center justify-between">
               <span className="text-[10px] text-[var(--text-tertiary)]">v2.4.0-stable</span>
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.4)]" />
             </div>

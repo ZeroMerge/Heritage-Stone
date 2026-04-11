@@ -14,6 +14,7 @@ import {
   RefreshCw 
 } from "lucide-react";
 import { clsx } from "clsx";
+import { HubSelect } from "../components/HubSelect.tsx";
 
 export function LivePreview() {
   const { slug: paramSlug, templateId: paramTemplateId } = useParams<{
@@ -76,38 +77,33 @@ export function LivePreview() {
   return (
     <div className="h-full flex flex-col animate-fade-in bg-[var(--hs-bg)]">
       {/* Dynamic Header */}
-      <header className="preview-header">
-        <div className="preview-selectors">
-          <div className="preview-selector">
-            <label className="text-xs-mono mb-1.5 block">Active Entity</label>
-            <select
+      <header className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-3 border-b border-[var(--hs-border)] bg-[var(--hs-surface)] shrink-0">
+        {/* Selectors – full width on mobile, side-by-side on sm+ */}
+        <div className="flex flex-col sm:flex-row gap-3 flex-1 min-w-0">
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <label className="text-xs-mono">Active Entity</label>
+            <HubSelect
               value={selectedSlug}
-              onChange={(e) => { setSelectedSlug(e.target.value); setIframeLoading(true); }}
-              className="hs-input w-full font-mono"
-            >
-              <option value="">— Choose Brand —</option>
-              {brands.map((b) => (
-                <option key={b.slug} value={b.slug}>
-                  {b.brand_name.toUpperCase()}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => { setSelectedSlug(val); setIframeLoading(true); }}
+              placeholder="— Choose Brand —"
+              options={[
+                { value: "", label: "— Choose Brand —" },
+                ...brands.map((b) => ({ value: b.slug, label: b.brand_name.toUpperCase() }))
+              ]}
+            />
           </div>
 
-          <div className="preview-selector">
-            <label className="text-xs-mono mb-1.5 block">Render Template</label>
-            <select
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <label className="text-xs-mono">Render Template</label>
+            <HubSelect
               value={selectedTemplateId}
-              onChange={(e) => { setSelectedTemplateId(e.target.value); setIframeLoading(true); }}
-              className="hs-input w-full"
-            >
-              <option value="">— Production Default —</option>
-              {templates.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => { setSelectedTemplateId(val); setIframeLoading(true); }}
+              placeholder="— Production Default —"
+              options={[
+                { value: "", label: "— Production Default —" },
+                ...templates.map((t) => ({ value: t.id, label: t.name }))
+              ]}
+            />
           </div>
         </div>
 

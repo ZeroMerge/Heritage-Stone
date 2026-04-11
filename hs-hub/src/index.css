@@ -311,28 +311,62 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   font-family: var(--font-sans);
-  transition: all var(--duration-base) var(--ease-out);
   cursor: pointer;
   border: 1px solid transparent;
   outline: none;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.hs-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.hs-btn:hover::after {
+  transform: scaleX(1);
+}
+
+/* Primary: accent orange base, swipes to a deeper saturated orange */
 .hs-btn-primary {
   background: var(--hs-accent);
-  color: var(--text-on-accent);
+  color: #0f0f0f;
   border-color: var(--hs-accent);
 }
-.hs-btn-primary:hover { opacity: 0.88; }
+.hs-btn-primary::after {
+  background: #b85e00;
+}
+.hs-btn-primary:hover {
+  color: #fff;
+  border-color: #b85e00;
+}
 
+/* Secondary: surface base, swipes to accent — theme-aware via CSS vars */
 .hs-btn-secondary {
   background: var(--bg-surface);
   color: var(--text-primary);
   border-color: var(--border-default);
 }
+.hs-btn-secondary::after {
+  background: var(--hs-accent);
+}
 .hs-btn-secondary:hover {
-  border-color: var(--border-strong);
-  background: var(--bg-elevated);
+  color: #0f0f0f;
+  border-color: var(--hs-accent);
+}
+
+/* Dark mode: secondary hover text stays dark on orange */
+.dark .hs-btn-secondary:hover {
+  color: #0f0f0f;
 }
 
 /* ─── Form Input ─────────────────────────────────────────────────────────────── */

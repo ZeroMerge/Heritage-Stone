@@ -7,6 +7,7 @@ import { useParams, useSearchParams, Link } from "react-router-dom";
 import { brandsApi, templatesApi, type ValueMappingResult, type TemplateRow } from "../lib/api.ts";
 import { CheckCircle, XCircle, Loader2, ChevronLeft } from "lucide-react";
 import { clsx } from "clsx";
+import { HubSelect } from "../components/HubSelect.tsx";
 
 export function ValueMapping() {
   const { slug: paramSlug } = useParams<{ slug: string }>();
@@ -44,7 +45,7 @@ export function ValueMapping() {
         Return to Assignment
       </Link>
 
-      <div className="flex items-end justify-between mb-12 border-b border-[var(--hs-border)] pb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[var(--hs-border)] pb-8 gap-6">
         <div>
           <h1 className="heading-xl text-[var(--hs-text)] mb-2">Value Mapping</h1>
           <p className="text-sm text-[var(--hs-text-muted)]">
@@ -52,20 +53,16 @@ export function ValueMapping() {
           </p>
         </div>
         
-        <div className="w-64">
+        <div className="w-full md:w-64 relative z-20">
           <label className="text-xs-mono mb-2 block">Comparison Target</label>
-          <select
+          <HubSelect
             value={selectedTemplateId}
-            onChange={(e) => setSelectedTemplateId(e.target.value)}
-            className="hs-input w-full !bg-[var(--hs-surface)]"
-          >
-            <option value="">— Generic Baseline —</option>
-            {templates.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => setSelectedTemplateId(val)}
+            options={[
+              { value: "", label: "— Generic Baseline —" },
+              ...templates.map(t => ({ value: t.id, label: t.name }))
+            ]}
+          />
         </div>
       </div>
 

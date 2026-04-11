@@ -28,7 +28,7 @@ export function ConfirmModal() {
   const confirmColors = {
     danger: "bg-red-600 hover:bg-red-700 text-white",
     warning: "bg-amber-600 hover:bg-amber-700 text-white",
-    info: "bg-[var(--hs-primary)] hover:opacity-90 text-white",
+    info: "bg-[var(--hs-primary)] hover:opacity-90 text-white dark:text-[#0f0f0f]",
   };
 
   return (

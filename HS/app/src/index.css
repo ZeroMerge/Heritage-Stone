@@ -386,36 +386,47 @@ body {
   padding: 0.625rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all var(--transition-base);
   cursor: pointer;
   border: none;
   outline: none;
   position: relative;
   overflow: hidden;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  isolation: isolate;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.btn:hover::after {
+  transform: scaleX(1);
 }
 
 .btn-primary {
   background: var(--hs-primary);
-  color: var(--text-inverse);
+  color: #ffffff;
+  border: 1px solid transparent;
 }
 
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #2a2a2a;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-base);
+/* In dark mode, --hs-primary becomes #f4f4f5 (light), so text must be dark */
+.dark .btn-primary {
+  color: #0f0f0f;
 }
 
-.btn-primary:hover::before {
-  transform: scaleX(1);
+/* Swipe reveals accent color */
+.btn-primary::after {
+  background: var(--hs-accent);
 }
 
-.btn-primary > * {
-  position: relative;
-  z-index: 1;
+.btn-primary:hover {
+  color: #0f0f0f;
 }
 
 .btn-secondary {
@@ -424,29 +435,20 @@ body {
   border: 1px solid var(--border-default);
 }
 
-.btn-secondary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
+/* Swipe reveals hs-primary */
+.btn-secondary::after {
   background: var(--hs-primary);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-base);
-}
-
-.btn-secondary:hover::before {
-  transform: scaleX(1);
 }
 
 .btn-secondary:hover {
-  border-color: var(--hs-primary);
   color: var(--text-inverse);
+  border-color: var(--hs-primary);
 }
 
-.btn-secondary > * {
-  position: relative;
-  z-index: 1;
+.dark .btn-secondary:hover {
+  color: #0f0f0f;
 }
+
 
 .btn-ghost {
   background: transparent;
@@ -886,3 +888,72 @@ body {
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* ─── Scrollbar Utilities ────────────────────────────────────────────────────── */
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Radix UI / Shadcn Dropdown Overrides ───────────────────────────────────── */
+
+/* Ensure Radix portals always sit above everything */
+[data-radix-popper-content-wrapper] {
+  z-index: 200 !important;
+}
+
+/* Dropdown content — opaque in both modes */
+[role="menu"],
+[data-radix-dropdown-menu-content],
+[data-state="open"][data-radix-dropdown-menu-content] {
+  background: var(--surface-default) !important;
+  border: 1px solid var(--border-default) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.16) !important;
+  border-radius: 0 !important;
+  padding: 4px !important;
+  min-width: 180px !important;
+}
+
+/* Dropdown item states */
+[role="menuitem"] {
+  color: var(--text-primary) !important;
+  border-radius: 0 !important;
+  font-size: 0.875rem !important;
+  transition: background var(--transition-fast) !important;
+}
+[role="menuitem"]:hover,
+[role="menuitem"]:focus {
+  background: var(--surface-subtle) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ─── Mark / Mention chip reset ─────────────────────────────────────────────── */
+
+/* Prevent browser default yellow highlight on <mark> used for @mentions */
+mark {
+  background: transparent;
+  color: inherit;
+}
+
+/* ─── Select field upgrade ───────────────────────────────────────────────────── */
+
+/* Style native <select> elements to match the design system */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+/* ─── Chat textarea auto-grow feel ──────────────────────────────────────────── */
+
+.chat-input {
+  field-sizing: content; /* progressive enhancement */
+}
+

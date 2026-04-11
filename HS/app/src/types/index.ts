@@ -409,6 +409,7 @@ export interface SubBrand {
   notes: string | null;
   brandColour: string;
   secondaryColour: string;
+  externalUrl?: string | null;
   assets: SubBrandAsset[];
   overrides: Record<string, unknown>;
   inheritedFields: string[];

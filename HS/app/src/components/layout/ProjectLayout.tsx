@@ -214,7 +214,7 @@ export function ProjectLayout() {
                   <button
                     onClick={handlePreviewPortal}
                     className="btn btn-primary text-sm py-1.5"
-                    style={{ backgroundColor: project.brandColour }}
+                    style={{ backgroundColor: project.brandColour, color: getContrastText(project.brandColour) }}
                   >
                     <ExternalLink className="w-4 h-4" />
                     <span className="hidden sm:inline">Preview</span>

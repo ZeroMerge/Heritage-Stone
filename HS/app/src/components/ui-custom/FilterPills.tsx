@@ -11,11 +11,16 @@ interface FilterPillsProps {
   filters: FilterOption[];
   active: string;
   onChange: (value: string) => void;
+  className?: string;
 }
 
-export function FilterPills({ filters, active, onChange }: FilterPillsProps) {
+export function FilterPills({ filters, active, onChange, className }: FilterPillsProps) {
   return (
-    <div className="flex flex-wrap gap-2 p-1 bg-[var(--surface-subtle)] rounded-full w-fit">
+    <div className={cn(
+      "flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0",
+      "p-1 bg-[var(--surface-subtle)] rounded-full w-fit max-w-full",
+      className
+    )}>
       {filters.map((filter) => {
         const isActive = active === filter.value;
 
@@ -24,25 +29,25 @@ export function FilterPills({ filters, active, onChange }: FilterPillsProps) {
             key={filter.value}
             onClick={() => onChange(filter.value)}
             className={cn(
-              "relative px-4 py-1.5 text-sm font-medium rounded-full transition-colors duration-300",
+              "relative px-3 py-1.5 text-xs sm:text-sm font-medium rounded-full transition-colors duration-300 whitespace-nowrap flex-shrink-0",
               isActive
-                ? "text-white"
+                ? "text-[#0f0f0f]"
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             )}
           >
             {isActive && (
               <motion.div
                 layoutId="filter-pill-bg"
-                className="absolute inset-0 bg-[var(--hs-primary)] rounded-full shadow-md"
+                className="absolute inset-0 bg-[var(--hs-accent)] rounded-full shadow-md"
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
+            <span className="relative z-10 flex items-center gap-1.5">
               {filter.label}
               {filter.count !== undefined && (
                 <span
                   className={cn(
-                    "px-2 py-0.5 text-[10px] rounded-full transition-colors",
+                    "px-1.5 py-0.5 text-[10px] rounded-full transition-colors",
                     isActive
                       ? "bg-white/20 text-white"
                       : "bg-[var(--border-strong)] text-[var(--text-primary)]"

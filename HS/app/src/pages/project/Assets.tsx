@@ -13,12 +13,14 @@ import {
   Search,
   Filter,
   Trash2,
+  X,
+  Check,
 } from "lucide-react";
 import { useProjectsStore, useUIStore } from "@/store";
 import { EmptyState } from "@/components/ui-custom/EmptyState";
-import { formatBytes } from "@/lib/utils";
+import { formatBytes, cn } from "@/lib/utils";
+import { uploadFile, buildUrl } from "@/lib/cloudinary";
 import type { Project, Asset, AssetCategory } from "@/types";
-import { cn } from "@/lib/utils";
 
 interface OverviewContext {
   project: Project;
@@ -48,6 +50,15 @@ export function Assets() {
   const [activeCategory, setActiveCategory] = useState<AssetCategory | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const isImage = (type: string) => type.startsWith("image/");
+
+  // Build Cloudinary thumbnail URL from fileUrl
+  const thumbUrl = (url: string) => {
+    // Insert c_thumb,w_240,h_160,q_auto,f_auto transformation
+    return url.replace("/upload/", "/upload/c_thumb,w_240,h_160,q_auto,f_auto/");
+  };
 
   const handleUploadAsset = async (data: Partial<Asset>, file: File) => {
     try {
@@ -116,9 +127,10 @@ export function Assets() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="flex flex-col lg:flex-row lg:items-center gap-4"
+        className="flex flex-col gap-3"
       >
-        <div className="flex flex-wrap gap-2">
+        {/* Category pills — compact, horizontal scroll on mobile */}
+        <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
@@ -126,37 +138,38 @@ export function Assets() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm transition-colors",
+                  "flex items-center gap-1 px-2 py-1 text-[11px] font-medium whitespace-nowrap flex-shrink-0 transition-colors rounded-full",
                   activeCategory === cat.id
-                    ? "bg-[var(--hs-primary)] text-white"
-                    : "bg-[var(--surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f]"
+                    : "bg-[var(--surface-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]"
                 )}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3 h-3 flex-shrink-0" />
                 {cat.label}
               </button>
             );
           })}
         </div>
 
-        <div className="flex items-center gap-2 ml-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+        {/* Search — full width on mobile */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-tertiary)]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search assets..."
               className={cn(
-                "pl-9 pr-4 py-2 bg-[var(--surface-default)] border border-[var(--border-default)]",
-                "text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
+                "w-full pl-8 pr-4 py-1.5 rounded-full bg-[var(--surface-default)] border border-[var(--border-default)]",
+                "text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
                 "focus:outline-none focus:border-[var(--hs-accent)]",
-                "transition-colors w-48"
+                "transition-colors"
               )}
             />
           </div>
-          <button className="p-2 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] transition-colors">
-            <Filter className="w-4 h-4" />
+          <button className="p-1.5 rounded-full text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] transition-colors border border-[var(--border-default)]">
+            <Filter className="w-3.5 h-3.5" />
           </button>
         </div>
       </motion.div>
@@ -168,7 +181,7 @@ export function Assets() {
         transition={{ duration: 0.3, delay: 0.2 }}
       >
         {filteredAssets.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             {filteredAssets.map((asset, index) => {
               const FileIcon = fileIcons[asset.fileType] || fileIcons.default;
 
@@ -178,30 +191,44 @@ export function Assets() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className="bg-[var(--surface-default)] border border-[var(--border-subtle)] group hover:border-[var(--hs-accent)] transition-colors"
+                  className="bg-[var(--surface-default)] border border-[var(--border-subtle)] rounded-xl group hover:border-[var(--hs-accent)] transition-colors"
                 >
-                  <div className="aspect-video bg-[var(--surface-subtle)] flex items-center justify-center">
-                    <FileIcon className="w-12 h-12 text-[var(--text-tertiary)]" />
+                  <div className="aspect-video bg-[var(--surface-subtle)] rounded-t-xl overflow-hidden flex items-center justify-center">
+                    {isImage(asset.fileType) ? (
+                      <img
+                        src={thumbUrl(asset.fileUrl)}
+                        alt={asset.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <FileIcon className="w-7 h-7 sm:w-10 sm:h-10 text-[var(--text-tertiary)]" />
+                    )}
                   </div>
 
-                  <div className="p-4">
-                    <h3 className="font-medium text-[var(--text-primary)] truncate">
+                  <div className="p-2 sm:p-3">
+                    <h3 className="font-medium text-[var(--text-primary)] truncate text-xs sm:text-sm">
                       {asset.name}
                     </h3>
-                    <p className="text-sm text-[var(--text-secondary)] mt-1">
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5 sm:mt-1">
                       {formatBytes(asset.fileSizeBytes)}
                     </p>
 
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border-subtle)]">
-                      <span className="text-xs text-[var(--text-tertiary)] capitalize">
+                    <div className="flex items-center justify-between mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-[var(--border-subtle)]">
+                      <span className="text-[10px] sm:text-xs text-[var(--text-tertiary)] capitalize">
                         {asset.category}
                       </span>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors">
-                          <Eye className="w-4 h-4" />
+                      <div className="flex items-center gap-0.5 sm:gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          className="p-1 sm:p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors"
+                          onClick={() => isImage(asset.fileType) ? setPreviewUrl(asset.fileUrl) : window.open(asset.fileUrl, '_blank')}
+                        >
+                          <Eye className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors">
-                          <Download className="w-4 h-4" />
+                        <button className="p-1 sm:p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors">
+                          <Download className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={(e) => {
@@ -214,12 +241,12 @@ export function Assets() {
                               onConfirm: () => deleteAsset(project.id, asset.id),
                             });
                           }}
-                          className="p-1.5 text-red-600 hover:bg-red-50 transition-colors"
+                          className="p-1 sm:p-1.5 text-red-600 hover:bg-red-900/10 transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors">
-                          <MoreVertical className="w-4 h-4" />
+                        <button className="p-1 sm:p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors">
+                          <MoreVertical className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -253,14 +280,30 @@ export function Assets() {
           onSubmit={handleUploadAsset}
         />
       )}
+
+      {/* Lightbox */}
+      {previewUrl && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setPreviewUrl(null)}
+        >
+          <button
+            onClick={() => setPreviewUrl(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white"
+          >
+            <X className="w-7 h-7" />
+          </button>
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="max-w-full max-h-[90vh] object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
-
-// --- Modals ---
-
-import { uploadFile, buildUrl } from "@/lib/cloudinary";
-import { X, Check } from "lucide-react";
 
 function UploadAssetModal({
   onClose,

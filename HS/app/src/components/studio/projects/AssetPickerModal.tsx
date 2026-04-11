@@ -102,7 +102,7 @@ export function AssetPickerModal({
                     className={cn(
                       "px-3 py-1.5 text-xs font-medium border transition-all",
                       activeCategory === cat.id 
-                        ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white" 
+                        ? "bg-[var(--hs-primary)] border-[var(--hs-primary)] text-white dark:text-[#0f0f0f]" 
                         : "bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]"
                     )}
                   >
@@ -153,12 +153,12 @@ export function AssetPickerModal({
                         )}
                       </div>
                       
-                      <div className="p-2 border-t border-[var(--border-subtle)] bg-[var(--surface-subtle)] group-hover:bg-[var(--hs-primary)] group-hover:text-white transition-colors">
+                      <div className="p-2 border-t border-[var(--border-subtle)] bg-[var(--surface-subtle)] group-hover:bg-[var(--hs-primary)] group-hover:text-white dark:group-hover:text-[#0f0f0f] transition-colors">
                         <p className="text-[11px] font-medium truncate text-left">{asset.name}</p>
                       </div>
 
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-[var(--hs-primary)] text-white p-1 rounded-full shadow-lg">
+                        <div className="bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] p-1 rounded-full shadow-lg">
                           <Check className="w-3 h-3" />
                         </div>
                       </div>

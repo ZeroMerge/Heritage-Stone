@@ -62,34 +62,37 @@ export function Projects() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="flex flex-col lg:flex-row lg:items-center gap-3"
+        className="flex flex-col gap-2"
       >
-        <FilterPills
-          filters={filters}
-          active={activeFilter}
-          onChange={setActiveFilter}
-        />
-
-        <div className="flex items-center gap-3 lg:ml-auto">
-          {/* Search — full width on mobile, fixed on desktop */}
-          <div className="relative flex-1 lg:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search projects..."
-              className={cn(
-                "pl-9 pr-4 py-2 w-full lg:w-64 bg-[var(--surface-default)] border border-[var(--border-default)]",
-                "text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
-                "focus:outline-none focus:border-[var(--hs-accent)]",
-                "transition-colors"
-              )}
+        {/* Row 1: pills (scrollable) + view toggle pinned right */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+            <FilterPills
+              filters={filters}
+              active={activeFilter}
+              onChange={setActiveFilter}
             />
           </div>
+          <div className="flex-shrink-0">
+            <ViewToggle />
+          </div>
+        </div>
 
-          {/* View Toggle */}
-          <ViewToggle />
+        {/* Row 2: search — full width on mobile */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search projects..."
+            className={cn(
+              "pl-9 pr-4 py-2 w-full rounded-full bg-[var(--surface-default)] border border-[var(--border-default)]",
+              "text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
+              "focus:outline-none focus:border-[var(--hs-accent)]",
+              "transition-colors"
+            )}
+          />
         </div>
       </motion.div>
 
@@ -101,8 +104,8 @@ export function Projects() {
           transition={{ duration: 0.3, delay: 0.2 }}
           className={cn(
             projectView === "grid"
-              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
-              : "space-y-4"
+              ? "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4"
+              : "space-y-2 sm:space-y-3"
           )}
         >
           {projects.map((project, index) => (

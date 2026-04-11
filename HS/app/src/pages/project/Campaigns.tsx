@@ -8,6 +8,8 @@ import {
   Check,
   X,
   Palette,
+  ExternalLink,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useProjectsStore, useUIStore } from "@/store";
 import { createSubBrand, calculateSubBrandHealthScore } from "@/lib/inheritance";
@@ -44,14 +46,18 @@ export function Campaigns() {
     description: string;
     brandColour: string;
     relationship: SubBrand["relationship"];
+    externalUrl?: string;
   }) => {
-    const newCampaign = createSubBrand(
-      project.id,
-      data.name,
-      data.brandColour,
-      data.description,
-      data.relationship
-    );
+    const newCampaign = {
+      ...createSubBrand(
+        project.id,
+        data.name,
+        data.brandColour,
+        data.description,
+        data.relationship
+      ),
+      externalUrl: data.externalUrl || null,
+    };
 
     updateProject(project.id, {
       subBrands: [...campaigns, newCampaign],
@@ -146,31 +152,64 @@ export function Campaigns() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
-              className="bg-[var(--surface-default)] border border-[var(--border-subtle)] overflow-hidden group"
+              className="bg-[var(--surface-default)] border border-[var(--border-subtle)] overflow-hidden group flex flex-col"
             >
+              {/* Brand color header */}
               <div
-                className="h-24 relative"
+                className="h-24 relative flex-shrink-0"
                 style={{ backgroundColor: campaign.brandColour }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                <div className="absolute bottom-3 right-3">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                {/* Relationship badge */}
+                <div className="absolute top-2 left-2 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] text-white font-medium capitalize">
+                    {(campaign.relationship || "campaign").replace(/_/g, " ")}
+                  </span>
+                </div>
+                <div className="absolute bottom-2 right-2">
                   <HealthScoreRing
                     score={calculateSubBrandHealthScore(campaign)}
-                    size={48}
+                    size={44}
                     strokeWidth={3}
                   />
                 </div>
               </div>
 
-              <div className="p-4">
+              <div className="p-4 flex-1 flex flex-col">
                 <h3 className="font-semibold text-[var(--text-primary)]">
                   {campaign.name}
                 </h3>
-                <p className="text-sm text-[var(--text-secondary)] mt-1 line-clamp-2">
+                <p className="text-sm text-[var(--text-secondary)] mt-1 line-clamp-2 flex-1">
                   {campaign.description}
                 </p>
 
+                {/* External link */}
+                {(campaign as any).externalUrl && (
+                  <a
+                    href={(campaign as any).externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center gap-1.5 text-xs font-medium text-[var(--hs-accent)] hover:underline truncate"
+                  >
+                    <LinkIcon className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{(campaign as any).externalUrl}</span>
+                    <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                  </a>
+                )}
+
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[var(--border-subtle)]">
+                  {/* External open button */}
+                  {(campaign as any).externalUrl && (
+                    <a
+                      href={(campaign as any).externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 text-[var(--text-secondary)] hover:text-[var(--hs-accent)] hover:bg-[var(--surface-subtle)] transition-colors"
+                      title="Open campaign link"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
                   <button
                     onClick={() => setEditingSubBrand(campaign)}
                     className="flex-1 btn btn-secondary text-sm flex items-center justify-center gap-1"
@@ -180,7 +219,7 @@ export function Campaigns() {
                   </button>
                   <button
                     onClick={() => handleDeleteCampaign(campaign.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 transition-colors"
+                    className="p-2 text-red-600 hover:bg-red-50 hover:bg-opacity-10 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -244,13 +283,15 @@ function AddCampaignModal({
     description: string;
     brandColour: string;
     relationship: SubBrand["relationship"];
+    externalUrl?: string;
   }) => void;
 }) {
   const [data, setData] = useState({
     name: "",
-    relationship: "subsidiary" as SubBrand["relationship"], // Default
+    relationship: "subsidiary" as SubBrand["relationship"],
     description: "",
     brandColour: "#0F0F0F",
+    externalUrl: "",
   });
 
   return (
@@ -347,6 +388,24 @@ function AddCampaignModal({
                 className="flex-1 px-4 py-2 bg-[var(--bg-primary)] border border-[var(--border-default)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--hs-accent)]"
               />
             </div>
+          </div>
+
+          {/* External URL */}
+          <div>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+              Campaign Link <span className="text-[var(--text-tertiary)] font-normal">(optional)</span>
+            </label>
+            <div className="flex items-center border border-[var(--border-default)] focus-within:border-[var(--hs-accent)] bg-[var(--bg-primary)]">
+              <LinkIcon className="w-4 h-4 ml-3 text-[var(--text-tertiary)] flex-shrink-0" />
+              <input
+                type="url"
+                value={data.externalUrl}
+                onChange={(e) => setData({ ...data, externalUrl: e.target.value })}
+                placeholder="https://campaign-site.com or /path/to/file.pdf"
+                className="flex-1 px-3 py-2 bg-transparent text-[var(--text-primary)] focus:outline-none text-sm"
+              />
+            </div>
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">Links to an external page, microsite, or PDF</p>
           </div>
         </div>
 
@@ -554,6 +613,26 @@ function EditCampaignModal({
                 )}
               />
             </div>
+          </div>
+
+          {/* External URL */}
+          <div className="p-4 border border-[var(--border-subtle)] bg-[var(--surface-subtle)]">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-[var(--text-primary)]">
+                Campaign Link <span className="text-[var(--text-tertiary)] font-normal">(optional)</span>
+              </label>
+            </div>
+            <div className="flex items-center border border-[var(--border-default)] focus-within:border-[var(--hs-accent)] bg-[var(--bg-primary)]">
+              <LinkIcon className="w-4 h-4 ml-3 text-[var(--text-tertiary)] flex-shrink-0" />
+              <input
+                type="url"
+                value={(data as any).externalUrl || ""}
+                onChange={(e) => setData({ ...data, externalUrl: e.target.value } as any)}
+                placeholder="https://campaign-site.com or /path/to/file.pdf"
+                className="flex-1 px-3 py-2 bg-transparent text-[var(--text-primary)] focus:outline-none text-sm"
+              />
+            </div>
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">Links to an external page, microsite, or PDF</p>
           </div>
 
           {/* Health Score Slider */}

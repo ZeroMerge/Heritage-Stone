@@ -68,9 +68,9 @@ export default function App() {
 
   useEffect(() => {
     checkSession();
-    // Hub defaults to dark mode
-    if (!document.documentElement.classList.contains("dark")) {
-      document.documentElement.classList.add("dark");
+    // Hub defaults to light mode
+    if (document.documentElement.classList.contains("dark")) {
+      document.documentElement.classList.remove("dark");
     }
   }, [checkSession]);
 

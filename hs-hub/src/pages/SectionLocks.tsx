@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { brandsApi, locksApi, type BrandRow, type SectionLockRow } from "../lib/api.ts";
 import { Lock, Unlock, Loader2, RefreshCw } from "lucide-react";
 import { clsx } from "clsx";
+import { HubSelect } from "../components/HubSelect.tsx";
 
 const ALL_SECTIONS = [
   "introduction","strategy","logo","color_palette",
@@ -64,25 +65,25 @@ export function SectionLocks() {
         </div>
       </div>
 
-      <div className="flex gap-8 mb-12">
-        <div className="flex-1">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-12">
+        <div className="flex-1 w-full relative z-20">
           <label className="text-xs-mono mb-2 block">Target Entity</label>
-          <select
+          <HubSelect
             value={selectedSlug}
-            onChange={(e) => setSelectedSlug(e.target.value)}
-            className="hs-input w-full !bg-[var(--hs-surface)] font-mono"
-          >
-            <option value="">— Choose brand —</option>
-            {brands.map((b) => <option key={b.slug} value={b.slug}>{b.brand_name.toUpperCase()}</option>)}
-          </select>
+            onChange={(val) => setSelectedSlug(val)}
+            options={[
+              { value: "", label: "— Choose brand —" },
+              ...brands.map((b) => ({ value: b.slug, label: b.brand_name.toUpperCase() }))
+            ]}
+          />
         </div>
-        <div className="w-64">
+        <div className="w-full md:w-64 relative z-10">
           <label className="text-xs-mono mb-2 block">Authorized Registrar</label>
           <input
             value={lockedBy}
             onChange={(e) => setLockedBy(e.target.value)}
             placeholder="HS-SYSTEM"
-            className="hs-input w-full !bg-[var(--hs-surface)]"
+            className="hs-input w-full !bg-[var(--hs-surface)] h-[46px]"
           />
         </div>
       </div>

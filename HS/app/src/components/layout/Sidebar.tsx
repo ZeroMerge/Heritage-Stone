@@ -110,7 +110,7 @@ export function Sidebar({ className }: { className?: string }) {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 transition-colors duration-150 group overflow-hidden",
                     active
-                      ? "bg-[var(--hs-primary)] text-white"
+                      ? "bg-[var(--hs-accent)] text-[#0f0f0f]"
                       : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
                   )}
                 >

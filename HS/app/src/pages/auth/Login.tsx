@@ -41,7 +41,7 @@ export function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-[var(--hs-primary)] flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-xl">HS</span>
+            <span className="text-white dark:text-[#0f0f0f] font-bold text-xl">HS</span>
           </div>
           <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
             HeritageStone Studio
@@ -133,7 +133,7 @@ export function Login() {
               type="submit"
               disabled={isLoading}
               className={cn(
-                "w-full py-2.5 px-4 bg-[var(--hs-primary)] text-white font-medium",
+                "w-full py-2.5 px-4 bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] font-medium",
                 "hover:bg-[var(--text-primary)] transition-colors",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 "flex items-center justify-center gap-2"

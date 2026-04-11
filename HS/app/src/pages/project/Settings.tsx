@@ -133,9 +133,12 @@ export function ProjectSettings() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="lg:w-64 flex-shrink-0"
+          className="lg:w-64 flex-shrink-0 relative"
         >
-          <div className="bg-[var(--surface-default)] border border-[var(--border-subtle)]">
+          {/* Scroll fade hints on mobile */}
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--surface-default)] to-transparent pointer-events-none lg:hidden" />
+          
+          <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible hide-scrollbar bg-[var(--surface-default)] border border-[var(--border-subtle)]">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -143,14 +146,14 @@ export function ProjectSettings() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors",
+                    "flex-shrink-0 lg:flex-shrink w-auto lg:w-full flex items-center gap-2 lg:gap-3 px-4 py-3 text-left transition-colors",
                     activeTab === tab.id
-                      ? "bg-[var(--surface-subtle)] text-[var(--text-primary)] border-l-2 border-[var(--hs-accent)]"
-                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)]"
+                      ? "bg-[var(--surface-subtle)] text-[var(--text-primary)] border-b-2 lg:border-b-0 lg:border-l-2 border-[var(--hs-accent)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] border-b-2 lg:border-b-0 lg:border-l-2 border-transparent"
                   )}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{tab.label}</span>
+                  <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <span className="font-medium text-sm lg:text-base whitespace-nowrap">{tab.label}</span>
                 </button>
               );
             })}
@@ -162,7 +165,7 @@ export function ProjectSettings() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="flex-1"
+          className="flex-1 min-w-0"
         >
           <div className="bg-[var(--surface-default)] border border-[var(--border-subtle)]">
             {/* General Tab */}

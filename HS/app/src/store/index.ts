@@ -552,6 +552,44 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       clientMembers: { ...state.clientMembers, [projectId]: members }
     })),
 
+  fetchClientMembers: async (projectId) => {
+    // Skip if already loaded
+    if (get().clientMembers[projectId]?.length) return;
+    try {
+      const { data, error } = await supabase
+        .from("client_members")
+        .select("*")
+        .eq("brand_id", projectId);
+      if (error) throw error;
+      const members: ClientMember[] = (data || []).map((m: any) => ({
+        id: m.id,
+        projectId: m.brand_id,
+        name: m.name || m.email || "Client",
+        email: m.email || "",
+        permissionLevel: m.permission_level || "viewer",
+        lastLogin: m.last_login_at || null,
+        invitedAt: m.created_at,
+        invitedBy: m.invited_by || "Studio",
+        isActive: m.is_active ?? true,
+      }));
+      set((state) => ({
+        clientMembers: { ...state.clientMembers, [projectId]: members }
+      }));
+
+      // Also load studio members if not loaded yet
+      if (!get().studioMembers.length) {
+        const { data: studioData } = await supabase
+          .from("studio_members")
+          .select("id, name, email, role");
+        if (studioData) {
+          set({ studioMembers: studioData as StudioMember[] });
+        }
+      }
+    } catch (err) {
+      console.error("fetchClientMembers error:", err);
+    }
+  },
+
   addClientMember: async (projectId, member) => {
     try {
       const newMember = {
