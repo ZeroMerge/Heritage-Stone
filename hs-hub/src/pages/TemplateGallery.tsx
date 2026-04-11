@@ -102,7 +102,7 @@ export function TemplateGallery() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 text-sm border text-[var(--hs-red)] bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-700/30">
+        <div className="error-banner animate-slide-up">
           {error}
         </div>
       )}

@@ -65,43 +65,53 @@ export function QuickActions() {
       <AnimatePresence>
         {showLaunchPicker && (
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.18 }}
-            className="absolute inset-0 bg-[var(--surface-default)] border border-[var(--border-subtle)] p-4 z-10 flex flex-col"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute inset-x-0 inset-y-0 bg-[var(--surface-default)] border border-[var(--border-subtle)] p-4 z-20 flex flex-col shadow-2xl"
           >
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
-                <Rocket className="w-4 h-4 text-[var(--hs-accent)]" />
-                Select Project to Launch
-              </h4>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-1 px-2 bg-[var(--hs-accent)] text-[#0f0f0f] text-[10px] uppercase font-bold tracking-tighter">Portal</div>
+                <h4 className="text-xs font-semibold text-[var(--text-primary)]">Select Project</h4>
+              </div>
               <button
                 onClick={() => setShowLaunchPicker(false)}
-                className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+                className="w-6 h-6 flex items-center justify-center text-[var(--text-tertiary)] hover:text-red-500 hover:bg-red-500/5 transition-all"
+                title="Cancel"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto space-y-1">
+            
+            <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
               {projects.length === 0 ? (
-                <p className="text-xs text-[var(--text-tertiary)] text-center py-6">No projects yet</p>
+                <div className="py-8 text-center">
+                  <p className="text-[10px] text-[var(--text-tertiary)] italic">No projects found</p>
+                </div>
               ) : (
                 projects.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => {
                       setShowLaunchPicker(false);
-                      navigate(`/p/${p.clientSlug}`);
+                      // Navigate to project launch screen
+                      navigate(`/project/${p.id}/launch`);
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-left hover:bg-[var(--surface-subtle)] transition-colors group"
+                    className="w-full flex items-center gap-3 p-2 bg-[var(--surface-subtle)] hover:bg-[var(--surface-hover)] border border-transparent hover:border-[var(--border-subtle)] transition-all group"
                   >
-                    <span
-                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: p.brandColour ?? "var(--hs-accent)" }}
-                    />
-                    <span className="flex-1 text-[var(--text-primary)] truncate">{p.name}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div 
+                      className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-[var(--surface-default)] border border-[var(--border-subtle)]"
+                      style={{ borderLeft: `3px solid ${p.brandColour || 'var(--hs-accent)'}` }}
+                    >
+                      <Rocket className="w-4 h-4 text-[var(--text-tertiary)] group-hover:text-[var(--hs-accent)] transition-colors" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-[var(--text-primary)] truncate">{p.name}</p>
+                      <p className="text-[10px] text-[var(--text-tertiary)] truncate">{p.clientName}</p>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
                   </button>
                 ))
               )}

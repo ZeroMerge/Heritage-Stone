@@ -21,16 +21,16 @@ export function HealthScoreRing({
 
   const getColor = () => {
     if (color) return color;
-    if (score >= 80) return "#10B981";
-    if (score >= 50) return "#F59E0B";
-    return "#EF4444";
+    if (score >= 80) return "var(--hs-green)";
+    if (score >= 50) return "var(--hs-yellow)";
+    return "var(--hs-red)";
   };
 
   const ringColor = getColor();
   // Scale font: compact or small ring → smaller text
   const fontSize = compact || size <= 48
-    ? `${Math.max(size * 0.18, 8)}px`
-    : `${Math.max(size * 0.22, 10)}px`;
+    ? `${Math.max(size * 0.14, 6)}px`
+    : `${Math.max(size * 0.18, 8)}px`;
 
   return (
     <div className="relative" style={{ width: size, height: size }}>

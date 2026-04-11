@@ -4,13 +4,18 @@ import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { TopbarMobile } from "./TopbarMobile";
 import { BottomNav } from "./BottomNav";
-import { useUIStore } from "@/store";
+import { useEffect } from "react";
+import { useUIStore, useProjectsStore } from "@/store";
 import { NewProjectModal } from "@/components/ui-custom/modals/NewProjectModal";
 import { SearchModal } from "@/components/ui-custom/modals/SearchModal";
 import { ConfirmModal } from "@/components/ui-custom/modals/ConfirmModal";
 
 export function Layout() {
-  useUIStore(); // ensure store is primed
+  const { fetchProjects, hasFetched } = useProjectsStore();
+  
+  useEffect(() => {
+    if (!hasFetched) fetchProjects();
+  }, [hasFetched, fetchProjects]);
 
   return (
     <div className="app-shell bg-[var(--bg-primary)]">

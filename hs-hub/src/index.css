@@ -346,7 +346,7 @@ body {
   background: #b85e00;
 }
 .hs-btn-primary:hover {
-  color: #fff;
+  color: #ffffff;
   border-color: #b85e00;
 }
 
@@ -362,11 +362,29 @@ body {
 .hs-btn-secondary:hover {
   color: #0f0f0f;
   border-color: var(--hs-accent);
+  z-index: 10;
 }
 
 /* Dark mode: secondary hover text stays dark on orange */
 .dark .hs-btn-secondary:hover {
   color: #0f0f0f;
+}
+
+/* Error Banner Utility */
+.error-banner {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  font-size: 0.875rem;
+  border-width: 1px;
+  color: var(--hs-red);
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  transition: all 0.2s ease;
+}
+
+.dark .error-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 /* ─── Form Input ─────────────────────────────────────────────────────────────── */

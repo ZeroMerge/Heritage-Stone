@@ -65,7 +65,7 @@ export function Projects() {
         className="flex flex-col gap-2"
       >
         {/* Row 1: pills (scrollable) + view toggle pinned right */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 -mx-4 px-4 sm:mx-0 sm:px-0">
           <div className="flex-1 min-w-0 overflow-x-auto scrollbar-none">
             <FilterPills
               filters={filters}
@@ -78,10 +78,12 @@ export function Projects() {
           </div>
         </div>
 
-        {/* Row 2: search — full width on mobile */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+        <div className="relative group/search">
+          <label htmlFor="project-search" className="absolute left-3 top-1/2 -translate-y-1/2 cursor-text">
+            <Search className="w-4 h-4 text-[var(--text-tertiary)] group-focus-within/search:text-[var(--hs-accent)] transition-colors" />
+          </label>
           <input
+            id="project-search"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

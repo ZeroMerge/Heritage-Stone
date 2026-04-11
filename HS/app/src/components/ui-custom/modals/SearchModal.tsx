@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, FolderKanban, ChevronRight } from "lucide-react";
+import { Search, FolderKanban, ChevronRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -39,7 +39,10 @@ export function SearchModal() {
 
   return (
     <Dialog open={isSearchModalOpen} onOpenChange={setSearchModalOpen}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-default)] shadow-2xl">
+      <DialogContent 
+        showCloseButton={false}
+        className="max-w-2xl p-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-default)] shadow-2xl"
+      >
         <div className="relative flex items-center p-4 border-b border-[var(--border-subtle)]">
           <Search className="w-5 h-5 text-[var(--text-tertiary)] mr-3" />
           <input
@@ -49,7 +52,14 @@ export function SearchModal() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <kbd className="px-2 py-1 text-[10px] text-[var(--text-tertiary)] bg-[var(--surface-subtle)] border border-[var(--border-default)] font-mono">ESC</kbd>
+          <button 
+            type="button"
+            onClick={() => setSearchModalOpen(false)}
+            className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            title="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto p-2">
