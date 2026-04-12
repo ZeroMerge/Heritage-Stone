@@ -2,6 +2,7 @@ services:
   - type: web
     name: hs-portal
     env: node
+    rootDir: hs-portal
     plan: free # Force the free tier
     buildCommand: ./render-build.sh
     startCommand: npm start
