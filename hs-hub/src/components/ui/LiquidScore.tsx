@@ -46,35 +46,29 @@ function luminance(r: number, g: number, b: number): number {
 }
 
 /** Derive liquid tint from the brand color, blending toward black or white based on luminance */
-function brandToLiquid(hex: string): { fill: string; wave: string; outline: string } {
+function brandToLiquid(hex: string): { fill: string; wave: string } {
   const [r, g, b] = hexToRgb(hex);
   const lum = luminance(r, g, b);
 
-  // For bright colors (lum > 0.35), blend toward black so liquid is darker than card bg
-  // For dark colors, blend toward white so liquid is lighter than card bg
-  const isLight = lum > 0.18;   // WCAG optimal crossover
+  // Now that cards are always dark (toCardSafeColour), liquid is always blending toward white
+  // so it reads clearly against the darkened card bg.
+  const isLight = lum > 0.18;
   const blend = 0.55;
 
   let lr: number, lg: number, lb: number;
   if (isLight) {
-    // blend toward black (0,0,0)
     lr = Math.round(r * (1 - blend));
     lg = Math.round(g * (1 - blend));
     lb = Math.round(b * (1 - blend));
   } else {
-    // blend toward white (255,255,255)
     lr = Math.round(r + (255 - r) * blend);
     lg = Math.round(g + (255 - g) * blend);
     lb = Math.round(b + (255 - b) * blend);
   }
 
-  // Ghost outline: use brand color itself, slightly transparent
-  const outline = `rgba(${r},${g},${b},0.22)`;
-
   return {
-    fill:    `rgba(${lr},${lg},${lb},0.88)`,
-    wave:    `rgba(${lr},${lg},${lb},0.48)`,
-    outline,
+    fill: `rgba(${lr},${lg},${lb},0.90)`,
+    wave: `rgba(${lr},${lg},${lb},0.50)`,
   };
 }
 
@@ -166,19 +160,6 @@ export function LiquidScore({
         </mask>
       </defs>
 
-      <!-- Ghost outline: uses brand color so it adapts to any background -->
-      <text
-        x="${W / 2}" y="${H * 0.91}"
-        text-anchor="middle"
-        font-family="'Space Grotesk',sans-serif"
-        font-weight="900"
-        font-size="${fontSize}"
-        letter-spacing="${lk}"
-        fill="none"
-        stroke="${colors.outline}"
-        stroke-width="1.5"
-      >${text}</text>
-
       <!-- Liquid clipped to letter shapes -->
       <g mask="url(#${maskId})">
         <path id="${uid}p1" fill="${colors.fill}">
@@ -187,7 +168,7 @@ export function LiquidScore({
             keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
             values="${idle1}"/>
         </path>
-        <path fill="${colors.wave}" opacity="0.55">
+        <path id="${uid}p2" fill="${colors.wave}" opacity="0.55">
           <animate id="${anim2Id}" attributeName="d"
             dur="2.2s" repeatCount="indefinite" calcMode="spline"
             keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
@@ -201,6 +182,9 @@ export function LiquidScore({
     anim1Ref.current = svg.querySelector(`#${anim1Id}`) as SVGAnimateElement;
     anim2Ref.current = svg.querySelector(`#${anim2Id}`) as SVGAnimateElement;
 
+    const path1 = svg.querySelector(`#${uid}p1`) as SVGPathElement | null;
+    const path2 = svg.querySelector(`#${uid}p2`) as SVGPathElement | null;
+
     const setTroubled = (on: boolean) => {
       if (troubledRef.current === on) return;
       troubledRef.current = on;
@@ -208,15 +192,21 @@ export function LiquidScore({
       const a2 = anim2Ref.current;
       if (!a1 || !a2) return;
       if (on) {
+        // Hover: troubled waves + letters go solid white
         a1.setAttribute("values", trouble1);
         a1.setAttribute("dur", "0.85s");
         a2.setAttribute("values", trouble2);
         a2.setAttribute("dur", "0.65s");
+        if (path1) { path1.setAttribute("fill", "rgba(255,255,255,1)"); }
+        if (path2) { path2.setAttribute("fill", "rgba(255,255,255,1)"); path2.setAttribute("opacity", "1"); }
       } else {
+        // Calm: return to liquid tint
         a1.setAttribute("values", idle1);
         a1.setAttribute("dur", "3s");
         a2.setAttribute("values", idle2);
         a2.setAttribute("dur", "2.2s");
+        if (path1) { path1.setAttribute("fill", colors.fill); }
+        if (path2) { path2.setAttribute("fill", colors.wave); path2.setAttribute("opacity", "0.55"); }
       }
       a1.beginElement?.();
       a2.beginElement?.();

@@ -96,7 +96,7 @@ async function calculateHealthScore(projectId: string): Promise<number> {
 
     return Math.min(100, score);
   } catch {
-    return 100; // fallback — don't break saves on score error
+    return 0; // fallback — don't break saves on score error
   }
 }
 
@@ -263,8 +263,8 @@ const mapSupabaseProjectToProject = (p: SupabaseProjectRow): Project => ({
   secondaryColour: (p.secondary_colour ?? "#0F0F0F") as string,
   goLiveDate: (p.go_live_date ?? null) as string | null,
   launchedAt: (p.launched_at ?? null) as string | null,
-  brandHealth: (p.brand_health ?? 100) as number,
-  healthScore: (p.health_score ?? 100) as number,
+  brandHealth: (p.brand_health ?? 0) as number,
+  healthScore: (p.health_score ?? 0) as number,
   version: (p.version ?? "1.0") as string,
   memberCount: (p.member_count ?? 0) as number,
   isPublished: (p.is_published ?? false) as boolean,
@@ -329,6 +329,8 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
           is_published: false,
           version: "1.0",
           brand_colour: data.brandColour || "#C9A96E",
+          health_score: 4,
+          brand_health: 4,
         })
         .select()
         .single();
