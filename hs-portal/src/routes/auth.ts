@@ -75,14 +75,11 @@ function accountLoginPage(redirect: string): string {
   return `<!DOCTYPE html><html><head>
   <title>Heritage Stone — Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter', sans-serif;background:#0a0a0a;color:#e8e8e8;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    body{font-family:system-ui,sans-serif;background:#0a0a0a;color:#e8e8e8;display:flex;align-items:center;justify-content:center;min-height:100vh;}
     .card{width:100%;max-width:400px;padding:2.5rem;background:#111;border:1px solid #242424;}
-    h1{font-family:'Bebas Neue', sans-serif;font-size:2.5rem;font-weight:400;margin-bottom:1rem;color:#c9a96e;letter-spacing:0.08em}
+    h1{font-size:1.5rem;font-weight:700;margin-bottom:1rem;color:#c9a96e}
     p{font-size:.875rem;color:#888;margin-bottom:2rem}
     .field{margin-bottom:1.25rem}
     label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:0.5rem;font-weight:700}
@@ -163,14 +160,11 @@ function accountLoginPage(redirect: string): string {
 function loginPage(brandName: string, slug: string, failed: boolean): string {
   return `<!DOCTYPE html><html><head>
   <title>${brandName} — Access Required</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter', sans-serif;background:#0a0a0a;color:#e8e8e8;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+    body{font-family:system-ui,sans-serif;background:#0a0a0a;color:#e8e8e8;display:flex;align-items:center;justify-content:center;min-height:100vh;}
     .card{width:100%;max-width:360px;padding:2rem;background:#111;border:1px solid #242424;border-radius:8px;}
-    h1{font-family:'Bebas Neue', sans-serif;font-weight:400;font-size:2rem;margin-bottom:.5rem;letter-spacing:0.08em;color:#e8e8e8}
+    h1{font-size:1.25rem;font-weight:600;margin-bottom:.5rem}
     p{font-size:.875rem;color:#888;margin-bottom:1.5rem}
     input{width:100%;padding:.625rem .75rem;background:#0a0a0a;border:1px solid #242424;color:#e8e8e8;border-radius:4px;font-size:.875rem;margin-bottom:1rem;outline:none;}
     input:focus{border-color:#c9a96e}
