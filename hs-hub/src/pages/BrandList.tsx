@@ -32,15 +32,17 @@ function accentFromSlug(slug: string): string {
   return ACCENT_PALETTE[hash % ACCENT_PALETTE.length];
 }
 
-// ── luminance-aware card theme ────────────────────────────────────────────────
+// ── luminance helpers ────────────────────────────────────────────────────────
 
-function hexLuminance(hex: string): number {
+function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
   const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
   const n = parseInt(full, 16);
-  const r = (n >> 16) & 255;
-  const g = (n >> 8)  & 255;
-  const b =  n        & 255;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function hexLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex);
   const lin = (v: number) => {
     const s = v / 255;
     return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
@@ -48,8 +50,51 @@ function hexLuminance(hex: string): number {
   return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }
 
+function hexToHsl(hex: string): [number, number, number] {
+  const [rr, gg, bb] = hexToRgb(hex).map((v) => v / 255);
+  const max = Math.max(rr, gg, bb), min = Math.min(rr, gg, bb);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let hh = 0;
+  if (max === rr) hh = ((gg - bb) / d + (gg < bb ? 6 : 0)) / 6;
+  else if (max === gg) hh = ((bb - rr) / d + 2) / 6;
+  else hh = ((rr - gg) / d + 4) / 6;
+  return [hh * 360, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const hue2rgb = (t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, "0");
+  return `#${toHex(hue2rgb(h / 360 + 1 / 3))}${toHex(hue2rgb(h / 360))}${toHex(hue2rgb(h / 360 - 1 / 3))}`;
+}
+
+/** Darkens hex until white text has WCAG 4.5:1 contrast. Same hue, just darker. */
+function toCardSafeColour(hex: string): string {
+  if (hexLuminance(hex) <= 0.18) return hex;
+  const [h, s, l] = hexToHsl(hex);
+  let lo = 0, hi = l;
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    if (hexLuminance(hslToHex(h, s, mid)) <= 0.18) lo = mid;
+    else hi = mid;
+  }
+  return hslToHex(h, s, lo);
+}
+
+// ── card theme (always white — safe colour guarantees it) ───────────────
+
 interface CardTheme {
-  isLight:   boolean;
   text:      string;
   textMid:   string;
   textSub:   string;
@@ -58,26 +103,13 @@ interface CardTheme {
   seam:      string;
 }
 
-function getCardTheme(hex: string): CardTheme {
-  const isLight = hexLuminance(hex) > 0.18;
-  if (isLight) {
-    return {
-      isLight,
-      text:      "rgba(0,0,0,0.80)",
-      textMid:   "rgba(0,0,0,0.90)",
-      textSub:   "rgba(0,0,0,0.55)",
-      textFaint: "rgba(0,0,0,0.38)",
-      border:    "rgba(0,0,0,0.18)",
-      seam:      "rgba(0,0,0,0.18)",
-    };
-  }
+function getCardTheme(): CardTheme {
   return {
-    isLight,
-    text:      "rgba(255,255,255,0.85)",
+    text:      "rgba(255,255,255,0.88)",
     textMid:   "rgba(255,255,255,1.00)",
-    textSub:   "rgba(255,255,255,0.55)",
-    textFaint: "rgba(255,255,255,0.38)",
-    border:    "rgba(255,255,255,0.18)",
+    textSub:   "rgba(255,255,255,0.62)",
+    textFaint: "rgba(255,255,255,0.42)",
+    border:    "rgba(255,255,255,0.20)",
     seam:      "rgba(255,255,255,0.22)",
   };
 }
@@ -142,10 +174,11 @@ export function BrandList() {
 // ── brand card ────────────────────────────────────────────────────────────────
 
 function BrandCard({ brand }: { brand: BrandRow }) {
-  const accent      = brand.brand_colour ?? accentFromSlug(brand.slug);
-  const theme       = getCardTheme(accent);
-  const ref         = getShortRef(brand.slug);
-  const isPublished = brand.is_published;
+  const rawAccent    = brand.brand_colour ?? accentFromSlug(brand.slug);
+  const displayColour = toCardSafeColour(rawAccent);
+  const theme        = getCardTheme();
+  const ref          = getShortRef(brand.slug);
+  const isPublished  = brand.is_published;
 
   const updatedDate = new Date(brand.updated_at).toLocaleDateString(undefined, {
     month: "short", day: "numeric", year: "numeric",
@@ -159,7 +192,7 @@ function BrandCard({ brand }: { brand: BrandRow }) {
   return (
     <div
       className="group relative overflow-hidden"
-      style={{ backgroundColor: accent }}
+      style={{ backgroundColor: displayColour }}
     >
       {/* Dashed seam */}
       <div
@@ -262,7 +295,7 @@ function BrandCard({ brand }: { brand: BrandRow }) {
         <div className="flex items-center gap-2 flex-wrap">
           <LiquidScore
             score={healthScore}
-            brandColour={accent}
+            brandColour={rawAccent}
             fontSize={22}
             className="mr-1"
           />
@@ -301,8 +334,8 @@ function BrandCard({ brand }: { brand: BrandRow }) {
             className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-black px-2 py-1 transition-colors"
             style={{
               fontFamily: "var(--font-mono)",
-              backgroundColor: theme.isLight ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,1)",
-              color:           theme.isLight ? "rgba(255,255,255,1)" : "rgba(0,0,0,1)",
+              backgroundColor: "rgba(255,255,255,1)",
+              color:           "rgba(0,0,0,1)",
             }}
           >
             <ExternalLink className="w-2.5 h-2.5" />

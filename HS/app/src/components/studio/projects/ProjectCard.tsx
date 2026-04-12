@@ -45,61 +45,92 @@ const STATUS_LABEL: Record<string, string> = {
   pending: "PENDING",
 };
 
-// ── luminance-aware card theme ───────────────────────────────────────────────
+// ── luminance helpers ────────────────────────────────────────────────────────
 
-function hexLuminance(hex: string): number {
+function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
   const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
   const n = parseInt(full, 16);
-  const r = (n >> 16) & 255;
-  const g = (n >> 8) & 255;
-  const b = n & 255;
-  const toLinear = (v: number) => {
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function hexLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex);
+  const lin = (v: number) => {
     const s = v / 255;
     return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
   };
-  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }
+
+function hexToHsl(hex: string): [number, number, number] {
+  const [rr, gg, bb] = hexToRgb(hex).map((v) => v / 255);
+  const max = Math.max(rr, gg, bb), min = Math.min(rr, gg, bb);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let hh = 0;
+  if (max === rr) hh = ((gg - bb) / d + (gg < bb ? 6 : 0)) / 6;
+  else if (max === gg) hh = ((bb - rr) / d + 2) / 6;
+  else hh = ((rr - gg) / d + 4) / 6;
+  return [hh * 360, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const hue2rgb = (t: number) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, "0");
+  return `#${toHex(hue2rgb(h / 360 + 1 / 3))}${toHex(hue2rgb(h / 360))}${toHex(hue2rgb(h / 360 - 1 / 3))}`;
+}
+
+/**
+ * Darkens a brand colour just enough so white text hits WCAG 4.5:1 contrast.
+ * Deep/dark colours (navy, charcoal, forest green) are returned unchanged.
+ * Neon colours (hot pink, lime, lemon) are darkened in HSL space — same hue,
+ * just lower lightness — so the brand identity is preserved.
+ */
+function toCardSafeColour(hex: string): string {
+  if (hexLuminance(hex) <= 0.18) return hex; // already safe for white text
+  const [h, s, l] = hexToHsl(hex);
+  let lo = 0, hi = l;
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    if (hexLuminance(hslToHex(h, s, mid)) <= 0.18) lo = mid;
+    else hi = mid;
+  }
+  return hslToHex(h, s, lo);
+}
+
+// ── card theme (always white — card bg is guaranteed dark enough) ─────────────
 
 interface CardTheme {
-  isLight: boolean;       // true = light/bright background → use dark ink
-  text:    string;        // primary text
-  textMid: string;        // project name / headings
-  textSub: string;        // secondary / muted
-  textFaint: string;      // very faint labels
-  border:  string;        // thin decorative borders
-  seam:    string;        // dashed inner seam
-  strip:   string;        // left accent strip
-  avatar:  string;        // avatar bg
+  text:      string;
+  textMid:   string;
+  textSub:   string;
+  textFaint: string;
+  border:    string;
+  seam:      string;
+  strip:     string;
+  avatar:    string;
 }
 
-function getCardTheme(brandColour: string): CardTheme {
-  const lum = hexLuminance(brandColour);
-  const isLight = lum > 0.18;   // WCAG optimal: dark text wins above 0.18
-
-  if (isLight) {
-    // Bright card → dark ink
-    return {
-      isLight,
-      text:      "rgba(0,0,0,0.80)",
-      textMid:   "rgba(0,0,0,0.90)",
-      textSub:   "rgba(0,0,0,0.55)",
-      textFaint: "rgba(0,0,0,0.38)",
-      border:    "rgba(0,0,0,0.18)",
-      seam:      "rgba(0,0,0,0.18)",
-      strip:     "rgba(0,0,0,0.20)",
-      avatar:    "rgba(0,0,0,0.12)",
-    };
-  }
-  // Dark card → white
+function getCardTheme(): CardTheme {
   return {
-    isLight,
-    text:      "rgba(255,255,255,0.85)",
+    text:      "rgba(255,255,255,0.88)",
     textMid:   "rgba(255,255,255,1.00)",
-    textSub:   "rgba(255,255,255,0.55)",
-    textFaint: "rgba(255,255,255,0.38)",
-    border:    "rgba(255,255,255,0.18)",
-    seam:      "rgba(255,255,255,0.20)",
+    textSub:   "rgba(255,255,255,0.62)",
+    textFaint: "rgba(255,255,255,0.42)",
+    border:    "rgba(255,255,255,0.20)",
+    seam:      "rgba(255,255,255,0.22)",
     strip:     "rgba(255,255,255,0.25)",
     avatar:    "rgba(255,255,255,0.15)",
   };
@@ -155,7 +186,9 @@ export function ProjectCard({ project, view = "grid" }: ProjectCardProps) {
   const { deleteProject, archiveProject } = useProjectsStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const theme       = getCardTheme(project.brandColour || "#C9A96E");
+  const theme        = getCardTheme();
+  const rawColour    = project.brandColour || "#C9A96E";
+  const displayColour = toCardSafeColour(rawColour); // darkened if too bright
   const ref         = getShortRef(project.id);
   const initials    = getInitials(project.name);
   const statusLabel = STATUS_LABEL[project.status] ?? project.status.toUpperCase();
@@ -174,7 +207,7 @@ export function ProjectCard({ project, view = "grid" }: ProjectCardProps) {
         whileHover={{ x: 2 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
         className="group relative flex items-stretch overflow-hidden"
-        style={{ backgroundColor: project.brandColour, minHeight: 72 }}
+        style={{ backgroundColor: displayColour, minHeight: 72 }}
       >
         {/* Dashed seam */}
         <div
@@ -296,7 +329,7 @@ export function ProjectCard({ project, view = "grid" }: ProjectCardProps) {
       whileHover={{ y: -3 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
       className="group relative overflow-hidden"
-      style={{ backgroundColor: project.brandColour }}
+      style={{ backgroundColor: displayColour }}
     >
       {/* Dashed seam */}
       <div
