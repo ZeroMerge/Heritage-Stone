@@ -160,7 +160,19 @@ export function LiquidScore({
         </mask>
       </defs>
 
-      <!-- Liquid clipped to letter shapes -->
+      <!-- Ghost silhouette: full number at low opacity so you see the whole shape -->
+      <text
+        id="${uid}ghost"
+        x="${W / 2}" y="${H * 0.91}"
+        text-anchor="middle"
+        font-family="'Space Grotesk',sans-serif"
+        font-weight="900"
+        font-size="${fontSize}"
+        letter-spacing="${lk}"
+        fill="rgba(255,255,255,0.22)"
+      >${text}</text>
+
+      <!-- Liquid clipped to letter shapes, sits on top of ghost -->
       <g mask="url(#${maskId})">
         <path id="${uid}p1" fill="${colors.fill}">
           <animate id="${anim1Id}" attributeName="d"
@@ -185,6 +197,8 @@ export function LiquidScore({
     const path1 = svg.querySelector(`#${uid}p1`) as SVGPathElement | null;
     const path2 = svg.querySelector(`#${uid}p2`) as SVGPathElement | null;
 
+    const ghost = svg.querySelector(`#${uid}ghost`) as SVGTextElement | null;
+
     const setTroubled = (on: boolean) => {
       if (troubledRef.current === on) return;
       troubledRef.current = on;
@@ -192,21 +206,23 @@ export function LiquidScore({
       const a2 = anim2Ref.current;
       if (!a1 || !a2) return;
       if (on) {
-        // Hover: troubled waves + letters go solid white
+        // Hover: troubled waves + whole number goes solid white
         a1.setAttribute("values", trouble1);
         a1.setAttribute("dur", "0.85s");
         a2.setAttribute("values", trouble2);
         a2.setAttribute("dur", "0.65s");
-        if (path1) { path1.setAttribute("fill", "rgba(255,255,255,1)"); }
-        if (path2) { path2.setAttribute("fill", "rgba(255,255,255,1)"); path2.setAttribute("opacity", "1"); }
+        if (ghost)  { ghost.setAttribute("fill", "rgba(255,255,255,0.90)"); }
+        if (path1)  { path1.setAttribute("fill", "rgba(255,255,255,1)"); }
+        if (path2)  { path2.setAttribute("fill", "rgba(255,255,255,1)"); path2.setAttribute("opacity", "1"); }
       } else {
-        // Calm: return to liquid tint
+        // Leave: calm waves + restore ghost silhouette
         a1.setAttribute("values", idle1);
         a1.setAttribute("dur", "3s");
         a2.setAttribute("values", idle2);
         a2.setAttribute("dur", "2.2s");
-        if (path1) { path1.setAttribute("fill", colors.fill); }
-        if (path2) { path2.setAttribute("fill", colors.wave); path2.setAttribute("opacity", "0.55"); }
+        if (ghost)  { ghost.setAttribute("fill", "rgba(255,255,255,0.22)"); }
+        if (path1)  { path1.setAttribute("fill", colors.fill); }
+        if (path2)  { path2.setAttribute("fill", colors.wave); path2.setAttribute("opacity", "0.55"); }
       }
       a1.beginElement?.();
       a2.beginElement?.();
