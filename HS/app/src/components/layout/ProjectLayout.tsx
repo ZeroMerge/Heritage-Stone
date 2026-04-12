@@ -138,7 +138,9 @@ export function ProjectLayout() {
     // Safely construct the URL, fallback to local dev url if empty
     const portalUrl = (project.portalSettings?.url && project.portalSettings.url.trim())
       ? `https://${project.portalSettings.url.trim()}` 
-      : (import.meta.env.VITE_PORTAL_URL || 'http://localhost:5174');
+      : (import.meta.env.VITE_PORTAL_URL || (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+            ? window.location.origin.replace("studio", "hub")
+            : "http://localhost:5174"));
       
     window.open(portalUrl, "_blank");
   };

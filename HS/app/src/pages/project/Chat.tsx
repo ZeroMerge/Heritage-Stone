@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
-  Send, Paperclip, MoreVertical, Search, CheckCheck,
+  Send, MoreVertical, Search, CheckCheck,
   MessageSquare, Plus, X, Mail, AtSign, Menu, Users,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -430,26 +430,20 @@ export function Chat() {
                   }
                 }}
                 placeholder="Message… type @ to mention"
-                className="w-full bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 pr-10 text-sm focus:ring-1 focus:ring-[var(--hs-accent)] focus:border-transparent placeholder:text-[var(--text-tertiary)] resize-none min-h-[40px] max-h-[120px] transition-all outline-none"
+                className="w-full bg-[var(--surface-subtle)] border border-[var(--border-subtle)] rounded-none px-3 sm:px-4 py-2.5 sm:py-3 text-sm focus:ring-1 focus:ring-[var(--hs-accent)] focus:border-transparent placeholder:text-[var(--text-tertiary)] resize-none min-h-[40px] max-h-[120px] transition-all outline-none"
               />
-              <button
-                type="button"
-                className="absolute right-3 bottom-2.5 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-              >
-                <Paperclip className="w-4 h-4" />
-              </button>
             </div>
             <button
               type="submit"
               disabled={!newMessage.trim()}
               className={cn(
-                "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0",
+                "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-all flex-shrink-0 rounded-none",
                 newMessage.trim()
-                  ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] hover:shadow-md active:scale-95"
+                  ? "bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] shadow-md hover:bg-[var(--hs-accent)] active:scale-95"
                   : "bg-[var(--surface-subtle)] text-[var(--text-tertiary)]"
               )}
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 ml-0.5" />
             </button>
           </form>
           <p className="mt-1.5 text-[10px] text-center text-[var(--text-tertiary)] hidden sm:block">

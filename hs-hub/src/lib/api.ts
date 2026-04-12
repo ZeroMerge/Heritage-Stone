@@ -3,7 +3,10 @@
 // All admin routes require the HUB_SECRET to be sent as x-hub-secret header.
 // The secret is read from VITE_HUB_SECRET env var — never expose publicly.
 
-const PORTAL_BASE = import.meta.env.VITE_PORTAL_URL ?? "http://localhost:3001";
+const PORTAL_BASE = import.meta.env.VITE_PORTAL_URL ?? 
+  (typeof window !== 'undefined' && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+    ? window.location.origin.replace("hub", "portal")
+    : "http://localhost:3001");
 const HUB_SECRET = import.meta.env.VITE_HUB_SECRET ?? "";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

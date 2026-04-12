@@ -13,6 +13,7 @@ import { ValueMapping }    from "./pages/ValueMapping.tsx";
 import { CacheAdmin }      from "./pages/CacheAdmin.tsx";
 import { SectionLocks }    from "./pages/SectionLocks.tsx";
 import { Login }           from "./pages/Login.tsx";
+import ClientLogin         from "./pages/ClientLogin.tsx";
 import { useAuthStore }    from "./store/auth";
 
 function AuthGuard() {
@@ -78,6 +79,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/client-login" element={<ClientLogin />} />
         <Route element={<AuthGuard />}>
           <Route path="*" element={<AppShell />} />
         </Route>

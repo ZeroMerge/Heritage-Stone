@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuthStore } from "@/store";
-import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export function Login() {
   const navigate = useNavigate();
@@ -12,6 +12,18 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,135 +38,177 @@ export function Login() {
       await login(email, password);
       navigate("/studio");
     } catch {
-      setError("Invalid email or password");
+      setError("Invalid credentials. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
+    <div className="min-h-screen bg-[var(--surface-base)] flex flex-col items-center justify-center relative overflow-hidden font-sans">
+      
+      {/* Continuous Flowing Gradient River */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <motion.div 
+          animate={{
+            x: ["-20%", "20%", "-20%"],
+            y: ["0%", "20%", "0%"],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full mix-blend-normal"
+          style={{
+             background: 'radial-gradient(circle, var(--hs-primary) 0%, transparent 70%)',
+             opacity: isDark ? 0.12 : 0.05,
+             filter: 'blur(100px)'
+          }}
+        />
+        <motion.div 
+          animate={{
+            x: ["20%", "-20%", "20%"],
+            y: ["20%", "0%", "20%"],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full mix-blend-normal"
+          style={{
+             background: 'radial-gradient(circle, var(--hs-accent) 0%, transparent 70%)',
+             opacity: isDark ? 0.08 : 0.04,
+             filter: 'blur(100px)'
+          }}
+        />
+        <motion.div 
+          animate={{
+            x: ["-10%", "10%", "-10%"],
+            y: ["-10%", "10%", "-10%"],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] left-[20%] w-[40vw] h-[40vw] rounded-full mix-blend-normal"
+          style={{
+             background: 'radial-gradient(circle, var(--text-tertiary) 0%, transparent 70%)',
+             opacity: isDark ? 0.05 : 0.03,
+             filter: 'blur(80px)'
+          }}
+        />
+      </div>
+
+      {/* Architectonic Grid Background */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-300"
+        style={{
+          backgroundImage: "linear-gradient(var(--text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--text-primary) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          opacity: isDark ? 0.05 : 0.03
+        }}
+      />
+      
+      {/* Theme Switcher Top Right */}
+      <div className="absolute top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[420px] relative z-10 px-6"
       >
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[var(--hs-primary)] flex items-center justify-center mx-auto mb-4">
-            <span className="text-white dark:text-[#0f0f0f] font-bold text-xl">HS</span>
-          </div>
-          <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
-            HeritageStone Studio
+        <div className="mb-10 flex flex-col items-center">
+          <img 
+            src={isDark ? "/logo/logo-dark.svg" : "/logo/logo-light.svg"} 
+            alt="Heritage Stone" 
+            className="w-16 h-16 object-contain mb-6"
+          />
+          <h1 className="text-3xl font-display font-medium tracking-tight text-[var(--text-primary)] mb-2">
+            Heritage Stone
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Sign in to your account
+          <p className="text-sm font-sans tracking-wide text-[var(--text-tertiary)] uppercase">
+            Studio Operating System
           </p>
         </div>
 
-        {/* Form */}
-        <div className="bg-[var(--surface-default)] border border-[var(--border-subtle)] p-6">
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                Email
+        <div className="bg-[var(--surface-default)]/80 backdrop-blur-md border border-[var(--border-default)] p-8 shadow-2xl relative overflow-hidden rounded-none">
+          {/* subtle inner top highlight */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--border-strong)] to-transparent opacity-50" />
+          
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-widest text-[var(--text-secondary)] block font-medium font-sans">
+                Email Address
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
-                  className={cn(
-                    "w-full pl-10 pr-4 py-2.5 bg-[var(--bg-primary)] border border-[var(--border-default)]",
-                    "text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
-                    "focus:outline-none focus:border-[var(--hs-accent)] focus:ring-1 focus:ring-[var(--hs-accent)]",
-                    "transition-colors"
-                  )}
-                />
+              <input
+                type="email"
+                required
+                className="w-full bg-[var(--surface-subtle)] border border-[var(--border-strong)] rounded-none px-4 py-3.5 text-[var(--text-primary)] text-sm placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--hs-primary)] focus:ring-1 focus:ring-[var(--hs-primary)] transition-all"
+                placeholder="architect@heritage.stone"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-xs uppercase tracking-widest text-[var(--text-secondary)] block font-medium font-sans">
+                  Password
+                </label>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                Password
-              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  required
+                  className="w-full bg-[var(--surface-subtle)] border border-[var(--border-strong)] rounded-none px-4 py-3.5 pr-12 text-[var(--text-primary)] text-sm placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--hs-primary)] focus:ring-1 focus:ring-[var(--hs-primary)] transition-all font-mono"
+                  placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className={cn(
-                    "w-full pl-10 pr-10 py-2.5 bg-[var(--bg-primary)] border border-[var(--border-default)]",
-                    "text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]",
-                    "focus:outline-none focus:border-[var(--hs-accent)] focus:ring-1 focus:ring-[var(--hs-accent)]",
-                    "transition-colors"
-                  )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
+                    <EyeOff className="w-4 h-4" />
                   ) : (
-                    <Eye className="w-5 h-5" />
+                    <Eye className="w-4 h-4" />
                   )}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-[var(--text-secondary)]">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 border-[var(--border-default)] rounded"
-                />
-                Remember me
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-[var(--hs-accent)] hover:underline"
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-3 bg-red-500/10 border border-red-500/20 rounded-none text-red-500 text-xs text-center font-medium"
               >
-                Forgot password?
-              </Link>
-            </div>
+                {error}
+              </motion.div>
+            )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className={cn(
-                "w-full py-2.5 px-4 bg-[var(--hs-primary)] text-white dark:text-[#0f0f0f] font-medium",
-                "hover:bg-[var(--text-primary)] transition-colors",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                "flex items-center justify-center gap-2"
-              )}
+              className="w-full relative group overflow-hidden rounded-none mt-4 border border-[var(--hs-primary)] bg-[var(--hs-primary)] text-[var(--text-inverse)] transition-all duration-300"
             >
-              {isLoading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                "Sign In"
-              )}
+              <div className="absolute inset-0 bg-[var(--text-inverse)] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+              <div className="relative flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[var(--text-inverse)]/70" />
+                    <span className="text-[var(--text-inverse)]/70">Authenticating...</span>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="uppercase tracking-widest font-sans text-xs font-bold text-[var(--text-inverse)]">Enter Studio</span>
+                    <ArrowRight className="w-4 h-4 text-[var(--text-inverse)]/70 group-hover:text-[var(--text-inverse)] group-hover:translate-x-1 transition-all" />
+                  </div>
+                )}
+              </div>
             </button>
           </form>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-sm text-[var(--text-secondary)] mt-6">
-          Do not have an account?{" "}
-          <Link to="/signup" className="text-[var(--hs-accent)] hover:underline font-medium">
-            Sign up
-          </Link>
-        </p>
+        <div className="mt-12 text-center">
+           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-tertiary)] font-mono">Secure Connection Established</p>
+        </div>
       </motion.div>
     </div>
   );

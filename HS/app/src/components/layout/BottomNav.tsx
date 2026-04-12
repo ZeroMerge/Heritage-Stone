@@ -37,7 +37,12 @@ export function BottomNav() {
       ))}
       {/* Hub shortcut */}
       <a
-        href="http://localhost:5174"
+        href={
+          import.meta.env.VITE_HUB_URL ||
+          (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+            ? window.location.origin.replace("studio", "hub")
+            : "http://localhost:5174")
+        }
         target="_blank"
         rel="noopener noreferrer"
         className="flex flex-col items-center justify-center flex-1 gap-0.5 text-[10px] font-medium tracking-tight text-[var(--text-tertiary)] transition-colors hover:text-[var(--hs-accent)]"
