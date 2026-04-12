@@ -59,7 +59,7 @@ interface CardTheme {
 }
 
 function getCardTheme(hex: string): CardTheme {
-  const isLight = hexLuminance(hex) > 0.35;
+  const isLight = hexLuminance(hex) > 0.18;
   if (isLight) {
     return {
       isLight,

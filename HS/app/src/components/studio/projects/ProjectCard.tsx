@@ -75,7 +75,7 @@ interface CardTheme {
 
 function getCardTheme(brandColour: string): CardTheme {
   const lum = hexLuminance(brandColour);
-  const isLight = lum > 0.35;
+  const isLight = lum > 0.18;   // WCAG optimal: dark text wins above 0.18
 
   if (isLight) {
     // Bright card → dark ink

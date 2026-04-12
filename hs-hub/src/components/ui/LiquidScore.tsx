@@ -52,7 +52,7 @@ function brandToLiquid(hex: string): { fill: string; wave: string; outline: stri
 
   // For bright colors (lum > 0.35), blend toward black so liquid is darker than card bg
   // For dark colors, blend toward white so liquid is lighter than card bg
-  const isLight = lum > 0.35;
+  const isLight = lum > 0.18;   // WCAG optimal crossover
   const blend = 0.55;
 
   let lr: number, lg: number, lb: number;
