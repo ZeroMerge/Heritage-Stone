@@ -30,6 +30,6 @@ services:
       - key: HUB_SECRET
         sync: false
       - key: TEMPLATES_DIR
-        value: ./templates
+        value: /app/templates
       - key: PORTAL_BASE_DOMAIN
         sync: false

@@ -11,9 +11,8 @@ RUN apt-get update && apt-get install -y wget gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 # Tell Puppeteer to skip installing Chrome since we're using the installed package.
-# Actually, the hs-portal code doesn't set executablePath explicitly so letting Puppeteer download
-# its bundled Chromium is safer. These apt packages just satisfy its shared library requirements.
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 WORKDIR /app
 
