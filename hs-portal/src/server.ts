@@ -176,8 +176,8 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 // ─── Start ───────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-  logger.info(`hs-portal running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  logger.info(`hs-portal running on http://0.0.0.0:${PORT}`);
   logger.info(`Allowed origins: ${allowedOrigins.join(", ")}`);
   logger.info(`Cache TTL: ${process.env.CACHE_TTL_SECONDS ?? 300}s`);
   logger.info(`Portal base domain: ${process.env.PORTAL_BASE_DOMAIN ?? "(not set — subdomain routing disabled)"}`);
