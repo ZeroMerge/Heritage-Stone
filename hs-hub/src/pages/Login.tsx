@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../store/auth";
@@ -54,12 +54,12 @@ export function Login() {
     setError(null);
 
     try {
-      const { data, loginError } = await supabase.auth.signInWithPassword({
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (loginError) throw loginError;
+      if (authError) throw authError;
 
       if (data.user) {
         setUser(data.user);
