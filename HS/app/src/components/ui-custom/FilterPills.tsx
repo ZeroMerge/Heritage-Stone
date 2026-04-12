@@ -13,12 +13,12 @@ interface FilterPillsProps {
   onChange: (value: string) => void;
   className?: string;
 }
-
 export function FilterPills({ filters, active, onChange, className }: FilterPillsProps) {
   return (
     <div className={cn(
-      "flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0",
-      "p-1 bg-[var(--surface-subtle)] rounded-full w-fit max-w-full",
+      "flex gap-1.5 flex-shrink-0 relative",
+      "p-1 bg-[var(--surface-subtle)] rounded-full w-max",
+      "after:content-[''] after:w-1 after:flex-shrink-0 sm:after:hidden",
       className
     )}>
       {filters.map((filter) => {

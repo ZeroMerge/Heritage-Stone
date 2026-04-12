@@ -41,7 +41,7 @@ export function SearchModal() {
     <Dialog open={isSearchModalOpen} onOpenChange={setSearchModalOpen}>
       <DialogContent 
         showCloseButton={false}
-        className="max-w-2xl p-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-default)] shadow-2xl"
+        className="w-[calc(100%-2rem)] sm:w-full sm:max-w-2xl p-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-default)] shadow-2xl"
       >
         <div className="relative flex items-center p-4 border-b border-[var(--border-subtle)]">
           <Search className="w-5 h-5 text-[var(--text-tertiary)] mr-3" />
