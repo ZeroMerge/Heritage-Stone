@@ -5,6 +5,47 @@ import { useAuthStore } from "../store/auth";
 import { Loader2, ArrowRight, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+
+function DecodingText({ text, className }: { text: string; className?: string }) {
+  const [displayedText, setDisplayedText] = useState(text);
+
+  useEffect(() => {
+    let iteration = 0;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    
+    // Slight delay before start
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setDisplayedText(() =>
+          text
+            .split("")
+            .map((_, index) => {
+              if (index < iteration) {
+                return text[index];
+              }
+              return LETTERS[Math.floor(Math.random() * 42)];
+            })
+            .join("")
+        );
+
+        if (iteration >= text.length) {
+          if (interval) clearInterval(interval);
+        }
+
+        iteration += 1 / 3;
+      }, 50);
+    }, 400);
+
+    return () => {
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+    };
+  }, [text]);
+
+  return <span className={className}>{displayedText}</span>;
+}
+
 function ThemeToggle() {
   const [isDark, setIsDark] = useState(() => {
     const stored = typeof localStorage !== "undefined" ? localStorage.getItem("hs-hub-theme") : null;
@@ -81,27 +122,29 @@ export function Login() {
           animate={{
             x: ["-20%", "20%", "-20%"],
             y: ["0%", "20%", "0%"],
-            scale: [1, 1.1, 1],
+            scale: [1, 1.3, 1],
+            rotate: [0, 90, 0]
           }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] rounded-full mix-blend-normal"
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-30%] left-[-20%] w-[90vw] h-[90vw] rounded-full mix-blend-normal"
           style={{
-             background: 'radial-gradient(circle, var(--hs-primary) 0%, transparent 70%)',
-             opacity: isDark ? 0.12 : 0.05,
-             filter: 'blur(100px)'
+             background: 'conic-gradient(from 180deg at 50% 50%, var(--hs-accent) 0deg, var(--hs-primary) 180deg, transparent 360deg)',
+             opacity: isDark ? 0.15 : 0.08,
+             filter: 'blur(120px)'
           }}
         />
         <motion.div 
           animate={{
             x: ["20%", "-20%", "20%"],
             y: ["20%", "0%", "20%"],
-            scale: [1, 1.2, 1],
+            scale: [1, 1.4, 1],
+            rotate: [0, -90, 0]
           }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full mix-blend-normal"
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-30%] right-[-20%] w-[80vw] h-[80vw] rounded-full mix-blend-normal"
           style={{
-             background: 'radial-gradient(circle, var(--hs-accent) 0%, transparent 70%)',
-             opacity: isDark ? 0.08 : 0.04,
+             background: 'radial-gradient(circle, var(--hs-secondary) 0%, transparent 70%)',
+             opacity: isDark ? 0.12 : 0.06,
              filter: 'blur(100px)'
           }}
         />
@@ -109,13 +152,14 @@ export function Login() {
           animate={{
             x: ["-10%", "10%", "-10%"],
             y: ["-10%", "10%", "-10%"],
+            scale: [0.8, 1.2, 0.8]
           }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] left-[20%] w-[40vw] h-[40vw] rounded-full mix-blend-normal"
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] left-[20%] w-[50vw] h-[50vw] rounded-full mix-blend-normal"
           style={{
-             background: 'radial-gradient(circle, var(--text-tertiary) 0%, transparent 70%)',
-             opacity: isDark ? 0.05 : 0.03,
-             filter: 'blur(80px)'
+             background: 'radial-gradient(circle, var(--text-tertiary) 0%, transparent 60%)',
+             opacity: isDark ? 0.08 : 0.04,
+             filter: 'blur(90px)'
           }}
         />
       </div>
@@ -142,17 +186,25 @@ export function Login() {
         className="w-full max-w-[420px] relative z-10 px-6"
       >
         <div className="mb-10 flex flex-col items-center">
-          <img 
+          <motion.img 
+            initial={{ opacity: 0, y: 10, rotate: -10 }}
+            animate={{ opacity: 1, y: 0, rotate: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             src={isDark ? "/logo/logo-dark.svg" : "/logo/logo-light.svg"} 
             alt="Heritage Stone" 
-            className="w-16 h-16 object-contain mb-6"
+            className="w-16 h-16 object-contain mb-6 drop-shadow-xl"
           />
-          <h1 className="text-3xl font-display font-medium tracking-tight text-[var(--text-primary)] mb-2">
-            Technical Hub
+          <h1 className="text-5xl font-['Bebas_Neue'] tracking-[0.08em] text-[var(--text-primary)] mb-2 drop-shadow-sm">
+            <DecodingText text="TECHNICAL HUB" />
           </h1>
-          <p className="text-sm font-sans tracking-wide text-[var(--text-tertiary)] uppercase">
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+            className="text-sm font-sans tracking-[0.2em] text-[var(--text-tertiary)] uppercase"
+          >
             Federated Authentication System
-          </p>
+          </motion.p>
         </div>
 
         <div className="bg-[var(--surface-default)]/80 backdrop-blur-md border border-[var(--border-default)] p-8 shadow-2xl relative overflow-hidden rounded-none">

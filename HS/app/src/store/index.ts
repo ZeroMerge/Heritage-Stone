@@ -235,6 +235,7 @@ interface ProjectsState {
   fetchClientMembers: (projectId: string) => Promise<void>;
   fetchChatMessages: (projectId: string) => Promise<void>;
   fetchActivityEvents: (projectId: string) => Promise<void>;
+  fetchBrandSections: (projectId: string) => Promise<void>;
   updateProjectSection: (projectId: string, sectionType: SupabaseSectionType, data: Record<string, unknown>) => Promise<void>;
 }
 
@@ -837,6 +838,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
       // Also fetch related data
       await Promise.all([
+        get().fetchBrandSections(id),
         get().fetchAssets(id),
         get().fetchActivityEvents(id),
         get().fetchChatMessages(id),
@@ -909,6 +911,79 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     }
   },
 
+  fetchBrandSections: async (projectId) => {
+    try {
+      const [
+        { data: intro },
+        { data: strat },
+        { data: logos },
+        { data: colors },
+        { data: fonts },
+        { data: images },
+        { data: icons },
+        { data: resources }
+      ] = await Promise.all([
+        supabase.from("brand_introductions").select("*").eq("brand_id", projectId).maybeSingle(),
+        supabase.from("brand_strategies").select("*").eq("brand_id", projectId).maybeSingle(),
+        supabase.from("brand_logos").select("*").eq("brand_id", projectId).order("sort_order"),
+        supabase.from("brand_colors").select("*").eq("brand_id", projectId).order("sort_order"),
+        supabase.from("brand_typography").select("*").eq("brand_id", projectId).order("sort_order"),
+        supabase.from("brand_images").select("*").eq("brand_id", projectId).maybeSingle(),
+        supabase.from("brand_icons").select("*").eq("brand_id", projectId).maybeSingle(),
+        supabase.from("brand_resources").select("*").eq("brand_id", projectId).order("sort_order"),
+      ]);
+
+      const snakeToCamel = (obj: any) => {
+        if (!obj) return obj;
+        const camelObj: any = {};
+        for (const key in obj) {
+          const camelKey = key.replace(/([-_][a-z])/g, group => group.toUpperCase().replace('-', '').replace('_', ''));
+          camelObj[camelKey] = obj[key];
+        }
+        return camelObj;
+      };
+
+      const sectionsMap: Record<string, any> = {};
+
+      if (intro) sectionsMap.introduction = snakeToCamel(intro);
+      if (strat) {
+        sectionsMap.strategy = snakeToCamel(strat);
+        sectionsMap.voice_tone = snakeToCamel({ tone_of_voice: strat.tone_of_voice, brand_personality: strat.brand_personality, target_audience: strat.target_audience });
+        sectionsMap.messaging = snakeToCamel({ messaging: strat.messaging });
+      }
+      if (logos && logos.length) sectionsMap.logo = { logos: logos.map(snakeToCamel) };
+      if (colors && colors.length) sectionsMap.color_palette = { colors: colors.map(snakeToCamel) };
+      if (fonts && fonts.length) sectionsMap.typography = { fonts: fonts.map(snakeToCamel) };
+      if (images) sectionsMap.photography = snakeToCamel(images);
+      if (icons) sectionsMap.icons = snakeToCamel(icons);
+      if (resources && resources.length) sectionsMap.resources = { resources: resources.map(snakeToCamel) };
+
+      const legacyFormattedSections = Object.keys(sectionsMap).map(key => ({
+        id: key,
+        projectId,
+        sectionKey: key as any,
+        content: sectionsMap[key],
+        approvalStatus: 'approved' as const,
+        approvedAt: null,
+        approvedBy: null,
+        revisionNote: null,
+        updatedAt: new Date().toISOString()
+      }));
+
+      set((state) => ({
+        brandSections: {
+          ...state.brandSections,
+          ...Object.fromEntries(
+            legacyFormattedSections.map(s => [`${projectId}-${s.id}`, [s]])
+          )
+        }
+      }));
+
+    } catch (err) {
+      console.error("Error fetching brand sections:", err);
+    }
+  },
+
   updateProjectSection: async (projectId, sectionType, data) => {
     try {
       set({ saveIndicator: "saving" });
@@ -942,7 +1017,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         if (rowsToInsert.length > 0) {
           const { error } = await supabase.from(tableName).insert(
             rowsToInsert.map((row, i) => ({
-              ...row,
+              ...camelToSnake(row),
               brand_id: projectId,
               sort_order: i,
               id: row.id ?? undefined // preserve ID if exists
