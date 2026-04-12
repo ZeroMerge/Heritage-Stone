@@ -17,8 +17,8 @@ interface FilterPillsProps {
 export function FilterPills({ filters, active, onChange, className }: FilterPillsProps) {
   return (
     <div className={cn(
-      "flex gap-1.5 overflow-x-auto scrollbar-none flex-shrink-0",
-      "p-1 bg-[var(--surface-subtle)] rounded-full w-fit max-w-full",
+      "flex gap-1.5",
+      "p-1 bg-[var(--surface-subtle)] rounded-full",
       className
     )}>
       {filters.map((filter) => {
@@ -29,7 +29,7 @@ export function FilterPills({ filters, active, onChange, className }: FilterPill
             key={filter.value}
             onClick={() => onChange(filter.value)}
             className={cn(
-              "relative px-3 py-1.5 text-xs sm:text-sm font-medium rounded-full transition-colors duration-300 whitespace-nowrap flex-shrink-0",
+              "relative px-3 py-1.5 text-xs sm:text-sm font-medium rounded-full transition-colors duration-200 whitespace-nowrap flex-shrink-0",
               isActive
                 ? "text-[#0f0f0f]"
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
