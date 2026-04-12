@@ -12,6 +12,8 @@ export interface BrandRow {
   id: string;
   slug: string;
   brand_name: string;
+  brand_colour: string | null;     // hex, e.g. "#C9A96E"
+  health_score: number | null;     // 0–100 computed brand completeness
   template_id: string;
   version: string;
   is_published: boolean;
@@ -22,6 +24,7 @@ export interface BrandRow {
   updated_at: string;
   template?: TemplateRow | null;
 }
+
 
 export interface TemplateRow {
   id: string;

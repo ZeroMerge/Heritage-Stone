@@ -3,8 +3,10 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Animated liquid-fill health score. The fill height is proportional to the
  * score (0–100). On hover the water gets troubled — bigger waves, faster tempo.
- * The liquid colour is derived from `brandColour` so it always harmonises with
- * the card background and respects the app theme automatically.
+ *
+ * The liquid color is derived LUMINANCE-AWARE from `brandColour`:
+ *   - Bright / light brand color  →  blend 55% toward  BLACK  (still readable)
+ *   - Dark brand color            →  blend 55% toward  WHITE  (still readable)
  *
  * Drop into:
  *   Studio  →  src/components/ui-custom/LiquidScore.tsx
@@ -23,36 +25,56 @@ interface LiquidScoreProps {
   className?: string;
 }
 
-/**
- * Blend brand colour toward white (or dark if bright) to produce a visible liquid tint
- */
-function brandToLiquid(hex: string): { fill: string; wave: string; bg: string; outline: string } {
+/** Parse hex to [r, g, b] 0–255 */
+function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
   const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
   const n = parseInt(full, 16);
-  if (isNaN(n)) return { fill: 'rgba(255,255,255,0.82)', wave: 'rgba(255,255,255,0.45)', bg: 'rgba(0,0,0,0.30)', outline: 'rgba(255,255,255,0.14)' };
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
 
-  const r = (n >> 16) & 255;
-  const g = (n >> 8) & 255;
-  const b = n & 255;
-  
-  // Calculate relative luminance to determine if the base colour is "bright"
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  const isBright = luminance > 0.7; // Threshold for bright colour
+/**
+ * Relative luminance (WCAG 2.1), range 0–1.
+ * > 0.35 = perceptually "light" (i.e. card background is bright)
+ */
+function luminance(r: number, g: number, b: number): number {
+  const c = [r, g, b].map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
 
+/** Derive liquid tint from the brand color, blending toward black or white based on luminance */
+function brandToLiquid(hex: string): { fill: string; wave: string; outline: string } {
+  const [r, g, b] = hexToRgb(hex);
+  const lum = luminance(r, g, b);
+
+  // For bright colors (lum > 0.35), blend toward black so liquid is darker than card bg
+  // For dark colors, blend toward white so liquid is lighter than card bg
+  const isLight = lum > 0.35;
   const blend = 0.55;
-  // Blend towards deep dark charcoal if bright, towards white if dark
-  const target = isBright ? 20 : 255; 
 
-  const lr = Math.round(r + (target - r) * blend);
-  const lg = Math.round(g + (target - g) * blend);
-  const lb = Math.round(b + (target - b) * blend);
-  
+  let lr: number, lg: number, lb: number;
+  if (isLight) {
+    // blend toward black (0,0,0)
+    lr = Math.round(r * (1 - blend));
+    lg = Math.round(g * (1 - blend));
+    lb = Math.round(b * (1 - blend));
+  } else {
+    // blend toward white (255,255,255)
+    lr = Math.round(r + (255 - r) * blend);
+    lg = Math.round(g + (255 - g) * blend);
+    lb = Math.round(b + (255 - b) * blend);
+  }
+
+  // Ghost outline: use brand color itself, slightly transparent
+  const outline = `rgba(${r},${g},${b},0.22)`;
+
   return {
-    fill: `rgba(${lr},${lg},${lb},0.82)`,
-    wave: `rgba(${lr},${lg},${lb},0.45)`,
-    bg:   isBright ? `rgba(255,255,255,0.30)` : `rgba(0,0,0,0.30)`,
-    outline: isBright ? `rgba(0,0,0,0.14)` : `rgba(255,255,255,0.14)`,
+    fill:    `rgba(${lr},${lg},${lb},0.88)`,
+    wave:    `rgba(${lr},${lg},${lb},0.48)`,
+    outline,
   };
 }
 
@@ -68,7 +90,6 @@ export function LiquidScore({
   className,
 }: LiquidScoreProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  // Keep refs so the hover handler can swap animation keyframes
   const anim1Ref = useRef<SVGAnimateElement | null>(null);
   const anim2Ref = useRef<SVGAnimateElement | null>(null);
   const troubledRef = useRef(false);
@@ -80,14 +101,13 @@ export function LiquidScore({
     const container = containerRef.current;
     if (!container) return;
 
-    // Remove any previous SVG on prop change
     container.querySelectorAll("svg").forEach((s) => s.remove());
 
     const uid = nextUid();
     const maskId = `${uid}M`;
     const anim1Id = `${uid}a1`;
     const anim2Id = `${uid}a2`;
-    const colors = brandToLiquid(brandColour);
+    const colors = brandToLiquid(brandColour || "#C9A96E");
 
     // Measure text with canvas
     const cv = document.createElement("canvas");
@@ -116,10 +136,10 @@ export function LiquidScore({
       );
     }
 
-    const idle1 = [wp(false, 1), wp(true, 1), wp(false, 1)].join(";");
-    const idle2 = [wp(true, 1), wp(false, 1), wp(true, 1)].join(";");
-    const trouble1 = [wp(false, 3.2), wp(true, 3.5), wp(false, 2.8), wp(true, 3.2), wp(false, 3.2)].join(";");
-    const trouble2 = [wp(true, 3.2), wp(false, 3.5), wp(true, 2.8), wp(false, 3.2), wp(true, 3.2)].join(";");
+    const idle1    = [wp(false, 1),   wp(true, 1),   wp(false, 1)].join(";");
+    const idle2    = [wp(true, 1),    wp(false, 1),  wp(true, 1)].join(";");
+    const trouble1 = [wp(false, 3.2), wp(true, 3.5), wp(false, 2.8), wp(true, 3.2),  wp(false, 3.2)].join(";");
+    const trouble2 = [wp(true, 3.2),  wp(false, 3.5),wp(true, 2.8),  wp(false, 3.2), wp(true, 3.2)].join(";");
 
     const NS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(NS, "svg") as SVGSVGElement;
@@ -128,6 +148,8 @@ export function LiquidScore({
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     svg.style.cssText = "position:absolute;top:0;left:0;z-index:2;overflow:hidden;";
 
+    // The "letter window" background is transparent — so the card bg shows through
+    // in the unfilled region, and liquid fills from the bottom.
     svg.innerHTML = `
       <defs>
         <mask id="${maskId}">
@@ -144,7 +166,7 @@ export function LiquidScore({
         </mask>
       </defs>
 
-      <!-- Ghost outline — softly shows the full number shape -->
+      <!-- Ghost outline: uses brand color so it adapts to any background -->
       <text
         x="${W / 2}" y="${H * 0.91}"
         text-anchor="middle"
@@ -159,7 +181,6 @@ export function LiquidScore({
 
       <!-- Liquid clipped to letter shapes -->
       <g mask="url(#${maskId})">
-        <rect width="${W}" height="${H}" fill="${colors.bg}"/>
         <path id="${uid}p1" fill="${colors.fill}">
           <animate id="${anim1Id}" attributeName="d"
             dur="3s" repeatCount="indefinite" calcMode="spline"
@@ -177,7 +198,6 @@ export function LiquidScore({
 
     container.appendChild(svg);
 
-    // Store anim refs for hover handler
     anim1Ref.current = svg.querySelector(`#${anim1Id}`) as SVGAnimateElement;
     anim2Ref.current = svg.querySelector(`#${anim2Id}`) as SVGAnimateElement;
 

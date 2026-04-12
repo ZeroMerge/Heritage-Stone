@@ -48,6 +48,58 @@ const invalidatePortalCache = async (slug: string) => {
   }
 };
 
+// ─── Health Score Calculator ─────────────────────────────────────────────────
+/**
+ * Computes a 0–100 brand health score from actual DB content.
+ * Each of 8 key sections is worth 12 pts (96 total).
+ * Base 4 pts for having name + colour set, so min attainable = 4 when empty.
+ *
+ * Sections scored:
+ *   introduction  12 — tagline or brand_description present
+ *   strategy      12 — mission or vision present
+ *   logo          12 — at least 1 logo row
+ *   color_palette 12 — at least 1 color row
+ *   typography    12 — at least 1 font row
+ *   photography   12 — hero_images or gallery_images not empty
+ *   icons         12 — icon_style set
+ *   resources     12 — at least 1 resource row
+ */
+async function calculateHealthScore(projectId: string): Promise<number> {
+  try {
+    const [intro, strategy, logos, colors, fonts, images, icons, resources] = await Promise.all([
+      supabase.from("brand_introductions").select("tagline, brand_description").eq("brand_id", projectId).maybeSingle(),
+      supabase.from("brand_strategies").select("mission, vision").eq("brand_id", projectId).maybeSingle(),
+      supabase.from("brand_logos").select("id", { count: "exact" }).eq("brand_id", projectId),
+      supabase.from("brand_colors").select("id", { count: "exact" }).eq("brand_id", projectId),
+      supabase.from("brand_typography").select("id", { count: "exact" }).eq("brand_id", projectId),
+      supabase.from("brand_images").select("hero_images, gallery_images").eq("brand_id", projectId).maybeSingle(),
+      supabase.from("brand_icons").select("icon_style").eq("brand_id", projectId).maybeSingle(),
+      supabase.from("brand_resources").select("id", { count: "exact" }).eq("brand_id", projectId),
+    ]);
+
+    let score = 4; // base: project exists
+    const s = (filled: boolean) => (filled ? 12 : 0);
+
+    score += s(!!(intro.data?.tagline || intro.data?.brand_description));
+    score += s(!!(strategy.data?.mission || strategy.data?.vision));
+    score += s((logos.count ?? 0) > 0);
+    score += s((colors.count ?? 0) > 0);
+    score += s((fonts.count ?? 0) > 0);
+    const imgData = images.data;
+    const hasImages = !!(imgData && (
+      (Array.isArray(imgData.hero_images)   && (imgData.hero_images as unknown[]).length   > 0) ||
+      (Array.isArray(imgData.gallery_images) && (imgData.gallery_images as unknown[]).length > 0)
+    ));
+    score += s(hasImages);
+    score += s(!!icons.data?.icon_style);
+    score += s((resources.count ?? 0) > 0);
+
+    return Math.min(100, score);
+  } catch {
+    return 100; // fallback — don't break saves on score error
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // UI State
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -947,6 +999,22 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         sectionKey: sectionType,
         description: `Updated the ${sectionType} section.`
       });
+
+      // ── Recalculate & persist health score ──────────────────
+      const newHealth = await calculateHealthScore(projectId);
+      await supabase
+        .from("brands")
+        .update({ health_score: newHealth, brand_health: newHealth })
+        .eq("id", projectId);
+      set((state) => ({
+        projects: state.projects.map((p) =>
+          p.id === projectId ? { ...p, healthScore: newHealth, brandHealth: newHealth } : p
+        ),
+        selectedProject:
+          state.selectedProject?.id === projectId
+            ? { ...state.selectedProject, healthScore: newHealth, brandHealth: newHealth }
+            : state.selectedProject,
+      }));
 
       set({ saveIndicator: "saved" });
       setTimeout(() => set({ saveIndicator: "idle" }), 2000);

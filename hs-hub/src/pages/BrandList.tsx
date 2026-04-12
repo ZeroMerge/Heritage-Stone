@@ -1,6 +1,9 @@
 /**
  * BrandList.tsx
  * HS-Hub → src/pages/BrandList.tsx
+ *
+ * All card text, borders, and decorations adapt to the brand colour's luminance.
+ * Bright cards (hot pink, lemon) → dark ink. Dark cards (navy, charcoal) → white.
  */
 
 import { useEffect, useState } from "react";
@@ -27,6 +30,56 @@ function accentFromSlug(slug: string): string {
     hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
   }
   return ACCENT_PALETTE[hash % ACCENT_PALETTE.length];
+}
+
+// ── luminance-aware card theme ────────────────────────────────────────────────
+
+function hexLuminance(hex: string): number {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(full, 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8)  & 255;
+  const b =  n        & 255;
+  const lin = (v: number) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+interface CardTheme {
+  isLight:   boolean;
+  text:      string;
+  textMid:   string;
+  textSub:   string;
+  textFaint: string;
+  border:    string;
+  seam:      string;
+}
+
+function getCardTheme(hex: string): CardTheme {
+  const isLight = hexLuminance(hex) > 0.35;
+  if (isLight) {
+    return {
+      isLight,
+      text:      "rgba(0,0,0,0.80)",
+      textMid:   "rgba(0,0,0,0.90)",
+      textSub:   "rgba(0,0,0,0.55)",
+      textFaint: "rgba(0,0,0,0.38)",
+      border:    "rgba(0,0,0,0.18)",
+      seam:      "rgba(0,0,0,0.18)",
+    };
+  }
+  return {
+    isLight,
+    text:      "rgba(255,255,255,0.85)",
+    textMid:   "rgba(255,255,255,1.00)",
+    textSub:   "rgba(255,255,255,0.55)",
+    textFaint: "rgba(255,255,255,0.38)",
+    border:    "rgba(255,255,255,0.18)",
+    seam:      "rgba(255,255,255,0.22)",
+  };
 }
 
 // ── page ──────────────────────────────────────────────────────────────────────
@@ -89,7 +142,8 @@ export function BrandList() {
 // ── brand card ────────────────────────────────────────────────────────────────
 
 function BrandCard({ brand }: { brand: BrandRow }) {
-  const accent      = accentFromSlug(brand.slug);
+  const accent      = brand.brand_colour ?? accentFromSlug(brand.slug);
+  const theme       = getCardTheme(accent);
   const ref         = getShortRef(brand.slug);
   const isPublished = brand.is_published;
 
@@ -97,9 +151,10 @@ function BrandCard({ brand }: { brand: BrandRow }) {
     month: "short", day: "numeric", year: "numeric",
   });
 
-  // BrandRow doesn't have a health score, so we derive a proxy from
-  // version number as a placeholder — swap for real field when available.
-  const healthProxy = Math.min(100, Math.round((brand.version ?? 1) * 20));
+  // Use real health_score if stored, else derive proxy from version
+  const healthScore = typeof brand.health_score === "number"
+    ? brand.health_score
+    : Math.min(100, Math.round((brand.version ?? 1) * 20));
 
   return (
     <div
@@ -109,27 +164,27 @@ function BrandCard({ brand }: { brand: BrandRow }) {
       {/* Dashed seam */}
       <div
         className="absolute pointer-events-none z-10"
-        style={{ inset: 7, border: "1px dashed rgba(255,255,255,0.22)" }}
+        style={{ inset: 7, border: `1px dashed ${theme.seam}` }}
       />
 
-      {/* ── HEADER: meta left · score + lock right ── */}
+      {/* ── HEADER: meta left · status + lock right ── */}
       <div className="relative z-20 flex items-start justify-between px-4 pt-4 gap-2">
         <div className="space-y-[3px]">
           <p
-            className="text-[9px] uppercase text-white/45 leading-none"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em" }}
+            className="text-[9px] uppercase leading-none"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em", color: theme.textFaint }}
           >
             Category // Brand
           </p>
           <p
-            className="text-[9px] uppercase text-white/35 leading-none"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em" }}
+            className="text-[9px] uppercase leading-none"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em", color: theme.textFaint }}
           >
             Ref. Doc: {ref}
           </p>
           <p
-            className="text-[9px] uppercase text-white/35 leading-none"
-            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em" }}
+            className="text-[9px] uppercase leading-none"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em", color: theme.textFaint }}
           >
             Template // {brand.template?.name ?? brand.template_id ?? "None"}
           </p>
@@ -138,16 +193,16 @@ function BrandCard({ brand }: { brand: BrandRow }) {
         <div className="flex items-start gap-1.5 flex-shrink-0">
           {brand.password_protected && (
             <span
-              className="flex items-center justify-center w-5 h-5 mt-1 bg-black/20"
+              className="flex items-center justify-center w-5 h-5 mt-1"
+              style={{ backgroundColor: "rgba(0,0,0,0.15)" }}
               title="Password protected"
             >
-              <Lock className="w-3 h-3 text-white/50" />
+              <Lock className="w-3 h-3" style={{ color: theme.textSub }} />
             </span>
           )}
-          {/* Published status pill */}
           <span
-            className="text-[9px] font-black uppercase tracking-[0.15em] text-white/65 mt-1"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="text-[9px] font-black uppercase tracking-[0.15em] mt-1"
+            style={{ fontFamily: "var(--font-mono)", color: theme.textSub }}
           >
             {isPublished ? "LIVE" : "DRAFT"}
           </span>
@@ -157,24 +212,25 @@ function BrandCard({ brand }: { brand: BrandRow }) {
       {/* Rule */}
       <div
         className="mx-4 mt-3"
-        style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.2)" }}
+        style={{ height: "1px", backgroundColor: theme.border }}
       />
 
       {/* ── BODY: brand name · slug ── */}
       <div className="px-4 pt-3 pb-2">
         <h2
-          className="font-black text-white leading-[1.0]"
+          className="font-black leading-[1.0]"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(18px, 3.5vw, 26px)",
             letterSpacing: "-0.04em",
+            color: theme.textMid,
           }}
         >
           {brand.brand_name}
         </h2>
         <p
-          className="mt-2 text-[11px] text-white/55 leading-relaxed"
-          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.06em" }}
+          className="mt-2 text-[11px] leading-relaxed"
+          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.06em", color: theme.textSub }}
         >
           /{brand.slug}
         </p>
@@ -183,20 +239,20 @@ function BrandCard({ brand }: { brand: BrandRow }) {
       {/* ── FOOTER: version · date · liquid score · actions ── */}
       <div
         className="flex items-center justify-between flex-wrap gap-2 px-4 pb-4 pt-2.5"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}
+        style={{ borderTop: `1px solid ${theme.border}` }}
       >
         {/* Left: version + date */}
         <div className="flex items-center gap-3">
           <span
-            className="text-[9px] uppercase tracking-[0.15em] text-white/45"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="text-[9px] uppercase tracking-[0.15em]"
+            style={{ fontFamily: "var(--font-mono)", color: theme.textFaint }}
           >
             v{brand.version}
           </span>
-          <span style={{ width: 1, height: 10, backgroundColor: "rgba(255,255,255,0.2)", display: "inline-block" }} />
+          <span style={{ width: 1, height: 10, backgroundColor: theme.border, display: "inline-block" }} />
           <span
-            className="text-[9px] uppercase tracking-[0.15em] text-white/45"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="text-[9px] uppercase tracking-[0.15em]"
+            style={{ fontFamily: "var(--font-mono)", color: theme.textFaint }}
           >
             {updatedDate}
           </span>
@@ -204,9 +260,8 @@ function BrandCard({ brand }: { brand: BrandRow }) {
 
         {/* Right: liquid score + action buttons */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Liquid score — hover to trouble the water */}
           <LiquidScore
-            score={healthProxy}
+            score={healthScore}
             brandColour={accent}
             fontSize={22}
             className="mr-1"
@@ -215,8 +270,12 @@ function BrandCard({ brand }: { brand: BrandRow }) {
           <Link
             to={`/assign/${brand.slug}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-bold px-2 py-1 border border-white/25 text-white/65 hover:bg-white/10 transition-colors"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-bold px-2 py-1 border transition-colors"
+            style={{
+              fontFamily: "var(--font-mono)",
+              borderColor: theme.border,
+              color: theme.textSub,
+            }}
           >
             <LayoutGrid className="w-2.5 h-2.5" />
             Assign
@@ -224,8 +283,12 @@ function BrandCard({ brand }: { brand: BrandRow }) {
           <Link
             to={`/locks?slug=${brand.slug}`}
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-bold px-2 py-1 border border-white/25 text-white/65 hover:bg-white/10 transition-colors"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-bold px-2 py-1 border transition-colors"
+            style={{
+              fontFamily: "var(--font-mono)",
+              borderColor: theme.border,
+              color: theme.textSub,
+            }}
           >
             <GitBranch className="w-2.5 h-2.5" />
             Locks
@@ -235,8 +298,12 @@ function BrandCard({ brand }: { brand: BrandRow }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-black px-2 py-1 bg-white text-black hover:bg-white/90 transition-colors"
-            style={{ fontFamily: "var(--font-mono)" }}
+            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-black px-2 py-1 transition-colors"
+            style={{
+              fontFamily: "var(--font-mono)",
+              backgroundColor: theme.isLight ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,1)",
+              color:           theme.isLight ? "rgba(255,255,255,1)" : "rgba(0,0,0,1)",
+            }}
           >
             <ExternalLink className="w-2.5 h-2.5" />
             Preview
