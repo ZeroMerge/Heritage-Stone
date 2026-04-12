@@ -9,11 +9,13 @@ import {
   ChevronRight,
   Menu,
   LayoutGrid,
+  Activity,
 } from "lucide-react";
 import { useUIStore, useAuthStore } from "@/store";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { useEffect, useState } from "react";
+import { SystemHealthModal } from "@/components/ui-custom/SystemHealthModal";
 
 const navItems = [
   { path: "/studio",          label: "Dashboard", icon: LayoutDashboard },
@@ -41,6 +43,7 @@ export function Sidebar({ className }: { className?: string }) {
   const [isTablet, setIsTablet] = useState(
     window.innerWidth >= 768 && window.innerWidth < 1280
   );
+  const [healthOpen, setHealthOpen] = useState(false);
 
   useEffect(() => {
     const onResize = () => {
@@ -133,6 +136,17 @@ export function Sidebar({ className }: { className?: string }) {
 
       {/* ── Footer ──────────────────────────────────────────── */}
       <div className="shrink-0 p-2 border-t border-[var(--border-subtle)] space-y-1 overflow-hidden">
+        <button
+          onClick={() => setHealthOpen(true)}
+          title={labelsHidden ? "System Health" : undefined}
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-subtle)] hover:text-[var(--text-primary)] transition-colors duration-150"
+        >
+          <Activity className="w-5 h-5 flex-shrink-0" />
+          <span className={cn("s-label text-sm font-medium", labelsHidden && "s-label-hidden")}>
+            System Health
+          </span>
+        </button>
+
         <a
           href="http://localhost:5174"
           target="_blank"
@@ -157,6 +171,10 @@ export function Sidebar({ className }: { className?: string }) {
           </span>
         </button>
       </div>
+
+      {healthOpen && (
+        <SystemHealthModal onClose={() => setHealthOpen(false)} />
+      )}
 
       {/* ── User Profile ─────────────────────────────────────── */}
       <div className="shrink-0 p-3 border-t border-[var(--border-subtle)] overflow-hidden">

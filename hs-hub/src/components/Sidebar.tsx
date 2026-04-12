@@ -8,13 +8,12 @@ import {
   GitBranch,
   Database,
   Activity,
-  ChevronDown,
-  ChevronRight,
   Settings,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle.tsx";
+import { SystemHealthModal } from "./SystemHealthModal.tsx";
 
 const nav = [
   { to: "/",          label: "Brands",          icon: List,        exact: true },
@@ -98,56 +97,18 @@ export function Sidebar() {
           <ThemeToggle />
         </div>
 
-        {/* System Health — collapsible */}
+        {/* System Health — triggers modal */}
         <button
-          onClick={() => setHealthOpen((o) => !o)}
+          onClick={() => setHealthOpen(true)}
           className="w-full flex items-center gap-3 px-3 py-2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
           title="System Health"
         >
           <Activity className="w-4 h-4 shrink-0" />
           <span className="sidebar-label text-xs font-medium flex-1 text-left">System Health</span>
-          <span className="sidebar-label">
-            {healthOpen
-              ? <ChevronDown className="w-3 h-3" />
-              : <ChevronRight className="w-3 h-3" />}
-          </span>
         </button>
 
         {healthOpen && (
-          <div className="sidebar-label mx-2 mb-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] p-3 animate-fade-in space-y-3 shadow-sm">
-            <div className="space-y-2 pb-2 border-b border-[var(--border-faint)]">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-wider text-[var(--text-tertiary)] font-bold">Status Rundown</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[var(--text-secondary)]">API Tier</span>
-                <span className="text-[11px] text-green-500 font-medium">Production</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[var(--text-secondary)]">Database</span>
-                <span className="text-[11px] text-green-500 font-medium">Healthy</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[var(--text-secondary)]">Sync Engine</span>
-                <span className="text-[11px] text-green-500 font-medium">Active</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[var(--text-secondary)]">Environment</span>
-                <span className="text-[11px] text-[var(--hs-accent)] font-medium">Render</span>
-              </div>
-            </div>
-            
-            <div className="space-y-1.5">
-              <p className="text-[9px] text-[var(--text-tertiary)] leading-relaxed">
-                Platform is optimized for Render hosting. Edge caching is enabled on static assets.
-              </p>
-              <div className="flex items-center justify-between text-[10px]">
-                <span className="text-[var(--text-tertiary)]">v2.4.0-stable</span>
-                <span className="text-[var(--text-muted)] italic">Uptime: 99.9%</span>
-              </div>
-            </div>
-          </div>
+          <SystemHealthModal onClose={() => setHealthOpen(false)} />
         )}
       </div>
     </aside>
