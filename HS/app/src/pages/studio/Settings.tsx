@@ -217,7 +217,7 @@ export function Settings() {
       </motion.div>
 
       {/* Tab bar */}
-      <div className="flex border-b border-[var(--border-subtle)] mb-6 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 after:content-[''] after:min-w-[16px] sm:after:hidden">
+      <div className="flex border-b border-[var(--border-subtle)] mb-6 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
         {SETTINGS_TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -247,7 +247,7 @@ export function Settings() {
             description="Manage your personal information and avatar"
             icon={User}
           >
-            <div className="space-y-8">
+            <div className="space-y-6">
               <div className="flex flex-col sm:flex-row items-center gap-8">
                 <div className="relative flex-shrink-0">
                   <img
@@ -304,13 +304,13 @@ export function Settings() {
                   />
                 </FormField>
               </div>
-            </div>
 
-            <div className="flex justify-end mt-6">
-              <button className="btn btn-primary" onClick={handleSaveProfile}>
-                <Save className="w-4 h-4" />
-                Save Profile
-              </button>
+              <div className="flex justify-end pt-2 border-t border-[var(--border-subtle)]">
+                <button className="btn btn-primary" onClick={handleSaveProfile}>
+                  <Save className="w-4 h-4" />
+                  Save Profile
+                </button>
+              </div>
             </div>
           </SectionCard>
         )}
@@ -401,23 +401,25 @@ export function Settings() {
             description="Manage your password and security settings"
             icon={Shield}
           >
-            <FormField label="Current Password">
-              <input type="password" placeholder="Enter your current password" className="input" />
-            </FormField>
+            <div className="space-y-6">
+              <FormField label="Current Password">
+                <input type="password" placeholder="Enter your current password" className="input" />
+              </FormField>
 
-            <FormField label="New Password">
-              <input type="password" placeholder="Enter a new password" className="input" />
-            </FormField>
+              <FormField label="New Password">
+                <input type="password" placeholder="Enter a new password" className="input" />
+              </FormField>
 
-            <FormField label="Confirm New Password">
-              <input type="password" placeholder="Confirm your new password" className="input" />
-            </FormField>
+              <FormField label="Confirm New Password">
+                <input type="password" placeholder="Confirm your new password" className="input" />
+              </FormField>
 
-            <div className="flex justify-end">
-              <button className="btn btn-primary">
-                <Shield className="w-4 h-4" />
-                Update Password
-              </button>
+              <div className="flex justify-end pt-2 border-t border-[var(--border-subtle)]">
+                <button className="btn btn-primary">
+                  <Shield className="w-4 h-4" />
+                  Update Password
+                </button>
+              </div>
             </div>
           </SectionCard>
         )}

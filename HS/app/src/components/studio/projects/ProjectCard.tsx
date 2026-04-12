@@ -46,7 +46,7 @@ export function ProjectCard({ project, view = "grid" }: ProjectCardProps) {
       <motion.div
         whileHover={{ x: 2 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        className="group relative flex items-stretch bg-[var(--surface-default)] border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-all overflow-hidden"
+        className="group relative flex items-stretch bg-[var(--surface-default)] border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-all"
         style={{ minHeight: 72 }}
       >
         {/* Brand colour strip */}

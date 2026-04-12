@@ -41,24 +41,24 @@ export function SearchModal() {
     <Dialog open={isSearchModalOpen} onOpenChange={setSearchModalOpen}>
       <DialogContent 
         showCloseButton={false}
-        className="w-[calc(100%-2rem)] sm:w-full sm:max-w-2xl p-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-default)] shadow-2xl"
+        className="w-[calc(100%-2rem)] max-w-2xl p-0 overflow-hidden border-[var(--border-default)] bg-[var(--surface-default)] shadow-2xl"
       >
-        <div className="relative flex items-center p-4 border-b border-[var(--border-subtle)]">
-          <Search className="w-5 h-5 text-[var(--text-tertiary)] mr-3" />
+        <div className="relative flex items-center p-3 sm:p-4 border-b border-[var(--border-subtle)] gap-2">
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-tertiary)] flex-shrink-0" />
           <input
             autoFocus
-            className="flex-1 bg-transparent border-none outline-none text-base text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
-            placeholder="Search projects by name, client, or industry..."
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm sm:text-base text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+            placeholder="Search projects..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           <button 
             type="button"
             onClick={() => setSearchModalOpen(false)}
-            className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            className="flex-shrink-0 p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
             title="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
@@ -104,24 +104,26 @@ export function SearchModal() {
               ))}
             </div>
           ) : (
-            <div className="py-12 flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 rounded-full bg-[var(--surface-subtle)] flex items-center justify-center mb-3 text-amber-500">
-                <Search className="w-6 h-6" />
+            <div className="py-8 sm:py-12 flex flex-col items-center justify-center text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--surface-subtle)] flex items-center justify-center mb-3 text-amber-500">
+                <Search className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <p className="text-sm font-medium text-[var(--text-secondary)]">No projects found for "{query}"</p>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1">Try a different search term</p>
+              <p className="text-xs sm:text-sm font-medium text-[var(--text-secondary)] px-4 truncate max-w-full">No results for "{query.slice(0, 24)}{query.length > 24 ? '…' : ''}"</p>
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">Try a different term</p>
             </div>
           )}
         </div>
 
-        <div className="p-3 bg-[var(--surface-subtle)] border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] text-[var(--text-tertiary)]">
-          <div className="flex items-center gap-4">
+        <div className="px-3 py-2 sm:p-3 bg-[var(--surface-subtle)] border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] text-[var(--text-tertiary)]">
+          <div className="hidden sm:flex items-center gap-4">
             <span className="flex items-center gap-1.5"><kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-default)] border border-[var(--border-subtle)] text-[9px]">ENTER</kbd> to select</span>
             <span className="flex items-center gap-1.5"><kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-default)] border border-[var(--border-subtle)] text-[9px]">ESC</kbd> to close</span>
           </div>
+          <div className="sm:hidden text-[10px] text-[var(--text-tertiary)]">Tap a result to open</div>
           <div className="font-medium flex items-center gap-1">
             <span className="w-1 h-1 rounded-full bg-[var(--hs-accent)]" />
-            Vibrant Project Search
+            <span className="hidden sm:inline">Vibrant Project Search</span>
+            <span className="sm:hidden">HS Search</span>
           </div>
         </div>
       </DialogContent>
