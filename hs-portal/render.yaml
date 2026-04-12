@@ -4,7 +4,7 @@ services:
     env: node
     plan: free # Force the free tier
     buildCommand: ./render-build.sh
-    startCommand: node dist/index.js # Adjust this to your actual start command
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
