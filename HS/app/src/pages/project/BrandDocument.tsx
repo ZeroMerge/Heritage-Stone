@@ -37,16 +37,16 @@ interface OverviewContext { project: Project }
 // ─── Section Config ───────────────────────────────────────────────────────────
 
 const sections: { id: SupabaseSectionType; label: string; icon: React.ElementType; description: string }[] = [
-  { id: "introduction",  label: "Introduction",  icon: FileText, description: "Cover, tagline & contacts" },
-  { id: "strategy",      label: "Strategy",       icon: Target,   description: "Mission, story & brand values" },
-  { id: "logo",          label: "Logo",           icon: Image,    description: "Logo system & variants" },
-  { id: "color_palette", label: "Colour Palette", icon: Palette,  description: "Palette, usage & accessibility" },
-  { id: "typography",    label: "Typography",     icon: Type,     description: "Fonts & type scale" },
-  { id: "photography",   label: "Photography",    icon: Camera,   description: "Photography direction & mood" },
-  { id: "voice_tone",    label: "Voice & Tone",   icon: Shapes,   description: "Brand voice descriptors & rules" },
-  { id: "messaging",     label: "Messaging",      icon: Globe,    description: "Headlines, taglines & key messages" },
-  { id: "icons",         label: "Icons",          icon: Shapes,   description: "Icon system & symbols" },
-  { id: "resources",     label: "Resources",      icon: Download, description: "Downloads & assets" },
+  { id: "introduction", label: "Introduction", icon: FileText, description: "Cover, tagline & contacts" },
+  { id: "strategy", label: "Strategy", icon: Target, description: "Mission, story & brand values" },
+  { id: "logo", label: "Logo", icon: Image, description: "Logo system & variants" },
+  { id: "color_palette", label: "Colour Palette", icon: Palette, description: "Palette, usage & accessibility" },
+  { id: "typography", label: "Typography", icon: Type, description: "Fonts & type scale" },
+  { id: "photography", label: "Photography", icon: Camera, description: "Photography direction & mood" },
+  { id: "voice_tone", label: "Voice & Tone", icon: Shapes, description: "Brand voice descriptors & rules" },
+  { id: "messaging", label: "Messaging", icon: Globe, description: "Headlines, taglines & key messages" },
+  { id: "icons", label: "Icons", icon: Shapes, description: "Icon system & symbols" },
+  { id: "resources", label: "Resources", icon: Download, description: "Downloads & assets" },
 ];
 
 // ─── Shared Primitives ────────────────────────────────────────────────────────
@@ -68,10 +68,10 @@ function Accordion({ title, children, defaultOpen = true, badge }: {
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-[var(--border-subtle)] bg-[var(--surface-default)] overflow-hidden">
+    <div className="border border-[var(--border-subtle)] bg-[var(--surface-default)]">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[var(--surface-subtle)] transition-colors group"
+        className="w-full flex items-center justify-between px-3 sm:px-5 py-3 sm:py-4 text-left hover:bg-[var(--surface-subtle)] transition-colors group"
       >
         <div className="flex items-center gap-3">
           <span className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-widest">{title}</span>
@@ -94,7 +94,7 @@ function Accordion({ title, children, defaultOpen = true, badge }: {
             transition={{ duration: 0.22, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-6 pt-2 border-t border-[var(--border-subtle)]">{children}</div>
+            <div className="px-3 sm:px-5 pb-5 pt-2 border-t border-[var(--border-subtle)]">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -200,9 +200,9 @@ function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (
   );
 }
 
-function UploadZone({ value, onChange, label, height = 160, accept = "image/*", onLibraryClick }: {
+function UploadZone({ value, onChange, label, height = 160, accept = "image/*", onLibraryClick, grow }: {
   value: string | null; onChange: (v: string | null) => void; label?: string; height?: number; accept?: string;
-  onLibraryClick?: () => void;
+  onLibraryClick?: () => void; grow?: boolean;
 }) {
   const [isUploading, setIsUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -229,7 +229,7 @@ function UploadZone({ value, onChange, label, height = 160, accept = "image/*", 
 
   if (value) {
     return (
-      <div className="relative overflow-hidden" style={{ height }} onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
+      <div className="relative overflow-hidden" style={{ minHeight: height }} onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
         <img src={value} alt="Uploaded" className="w-full h-full object-cover" />
         <AnimatePresence>
           {hovering && (
@@ -254,7 +254,7 @@ function UploadZone({ value, onChange, label, height = 160, accept = "image/*", 
   }
 
   return (
-    <div>
+    <div className={cn(grow && "flex flex-col flex-1")}>
       {label && <FieldLabel>{label}</FieldLabel>}
       <label
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -262,10 +262,11 @@ function UploadZone({ value, onChange, label, height = 160, accept = "image/*", 
         onDrop={handleDrop}
         className={cn(
           "flex flex-col items-center justify-center border border-dashed cursor-pointer transition-all relative",
+          grow && "flex-1",
           dragging ? "border-[var(--hs-accent)] bg-[var(--hs-accent)]/5" : "border-[var(--border-strong)] bg-[var(--surface-subtle)] hover:border-[var(--border-default)] hover:bg-[var(--surface-hover)]",
           isUploading && "opacity-50 cursor-wait pointer-events-none"
         )}
-        style={{ height }}
+        style={{ minHeight: height }}
       >
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
@@ -273,27 +274,27 @@ function UploadZone({ value, onChange, label, height = 160, accept = "image/*", 
             <p className="text-xs text-[var(--text-secondary)] font-medium">Uploading...</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-3 w-full px-6 text-center">
+          <div className="flex flex-col items-center gap-3 w-full px-4 py-6 text-center">
             <div className="flex flex-col items-center">
-              <Upload className="w-5 h-5 text-[var(--text-tertiary)] mb-1.5" />
-              <p className="text-sm text-[var(--text-secondary)]">Drop or <span className="text-[var(--hs-accent)] underline underline-offset-2">browse</span></p>
+              <Upload className="w-4 h-4 text-[var(--text-tertiary)] mb-1.5" />
+              <p className="text-xs text-[var(--text-secondary)]">Drop or <span className="text-[var(--hs-accent)] underline underline-offset-2">browse</span></p>
             </div>
-            
+
             {onLibraryClick && (
-              <div className="flex items-center gap-2 w-full max-w-[180px]">
+              <div className="flex items-center gap-2 w-full max-w-[160px]">
                 <div className="h-px flex-1 bg-[var(--border-subtle)]" />
-                <span className="text-[9px] uppercase tracking-widest text-[var(--text-tertiary)] bg-[var(--surface-subtle)] px-2">OR</span>
+                <span className="text-[9px] uppercase tracking-widest text-[var(--text-tertiary)] bg-[var(--surface-subtle)] px-1">OR</span>
                 <div className="h-px flex-1 bg-[var(--border-subtle)]" />
               </div>
             )}
 
             {onLibraryClick && (
-              <button 
+              <button
                 type="button"
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLibraryClick(); }}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[var(--surface-default)] border border-[var(--border-default)] text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-active)] hover:text-[var(--text-primary)] transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--surface-default)] border border-[var(--border-default)] text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-active)] hover:text-[var(--text-primary)] transition-all"
               >
-                <Library className="w-3.5 h-3.5" /> Select from Library
+                <Library className="w-3 h-3" /> Select from Library
               </button>
             )}
           </div>
@@ -306,8 +307,8 @@ function UploadZone({ value, onChange, label, height = 160, accept = "image/*", 
 
 // ─── 01 INTRODUCTION EDITOR ───────────────────────────────────────────────────
 
-function IntroductionEditor({ data, setData, openAssetPicker }: { 
-  data: Partial<BrandIntroduction>; 
+function IntroductionEditor({ data, setData, openAssetPicker }: {
+  data: Partial<BrandIntroduction>;
   setData: (d: any) => void;
   openAssetPicker?: (cat: AssetCategory, onSelect: (url: string) => void) => void;
 }) {
@@ -315,10 +316,10 @@ function IntroductionEditor({ data, setData, openAssetPicker }: {
 
   const SOCIAL_PLATFORMS = [
     { key: "instagram", icon: Instagram, label: "Instagram" },
-    { key: "twitter",   icon: Twitter,   label: "X / Twitter" },
-    { key: "linkedin",  icon: Linkedin,  label: "LinkedIn" },
-    { key: "youtube",   icon: Youtube,   label: "YouTube" },
-    { key: "facebook",  icon: Facebook,  label: "Facebook" },
+    { key: "twitter", icon: Twitter, label: "X / Twitter" },
+    { key: "linkedin", icon: Linkedin, label: "LinkedIn" },
+    { key: "youtube", icon: Youtube, label: "YouTube" },
+    { key: "facebook", icon: Facebook, label: "Facebook" },
   ];
 
   const getSocial = (platform: string) => (data.socialLinks || []).find((s) => s.platform === platform)?.url || "";
@@ -331,27 +332,29 @@ function IntroductionEditor({ data, setData, openAssetPicker }: {
     <div className="space-y-5">
       <Accordion title="Cover & Identity">
         <div className="space-y-5 pt-3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:items-stretch">
+            <div className="flex flex-col">
               <FieldLabel hint="Full-width image leading the brand portal">Cover Image</FieldLabel>
-              <UploadZone 
-                value={data.coverImageUrl || null} 
-                onChange={(v) => set("coverImageUrl", v)} 
+              <UploadZone
+                value={data.coverImageUrl || null}
+                onChange={(v) => set("coverImageUrl", v)}
                 height={200}
+                grow
                 onLibraryClick={openAssetPicker ? () => openAssetPicker('photography', (url) => set("coverImageUrl", url)) : undefined}
               />
             </div>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div>
                 <FieldLabel hint="Paste a direct video URL instead of image">Cover Video URL</FieldLabel>
                 <TextInput value={data.coverVideoUrl || ""} onChange={(v) => set("coverVideoUrl", v)} placeholder="https://vimeo.com/..." />
               </div>
-              <div>
+              <div className="flex flex-col flex-1">
                 <FieldLabel hint="Small symbol used as avatar in portal header">Brand Mark</FieldLabel>
-                <UploadZone 
-                  value={data.brandMarkUrl || null} 
-                  onChange={(v) => set("brandMarkUrl", v)} 
+                <UploadZone
+                  value={data.brandMarkUrl || null}
+                  onChange={(v) => set("brandMarkUrl", v)}
                   height={80}
+                  grow
                   onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_logos', (url) => set("brandMarkUrl", url)) : undefined}
                 />
               </div>
@@ -367,10 +370,10 @@ function IntroductionEditor({ data, setData, openAssetPicker }: {
               <FieldLabel hint="Controls tagline size in the portal cover">Tagline Display Size</FieldLabel>
               <SelectField value={data.taglineSize || ""} onChange={(v) => set("taglineSize", v)} placeholder="Select size"
                 options={[
-                  { value: "small",    label: "Small — understated" },
-                  { value: "medium",   label: "Medium — balanced" },
-                  { value: "large",    label: "Large — prominent" },
-                  { value: "editorial",label: "Editorial — full screen" },
+                  { value: "small", label: "Small — understated" },
+                  { value: "medium", label: "Medium — balanced" },
+                  { value: "large", label: "Large — prominent" },
+                  { value: "editorial", label: "Editorial — full screen" },
                 ]}
               />
             </div>
@@ -431,29 +434,29 @@ function IntroductionEditor({ data, setData, openAssetPicker }: {
 // ─── 02 STRATEGY EDITOR ──────────────────────────────────────────────────────
 
 const ARCHETYPES: { id: BrandArchetype; description: string }[] = [
-  { id: "Hero",     description: "Courageous, determined, bold" },
-  { id: "Creator",  description: "Inventive, artistic, original" },
-  { id: "Sage",     description: "Wise, knowledgeable, trusted" },
+  { id: "Hero", description: "Courageous, determined, bold" },
+  { id: "Creator", description: "Inventive, artistic, original" },
+  { id: "Sage", description: "Wise, knowledgeable, trusted" },
   { id: "Explorer", description: "Adventurous, free, authentic" },
-  { id: "Ruler",    description: "Powerful, authoritative, leading" },
-  { id: "Caregiver",description: "Nurturing, generous, protective" },
+  { id: "Ruler", description: "Powerful, authoritative, leading" },
+  { id: "Caregiver", description: "Nurturing, generous, protective" },
   { id: "Innocent", description: "Optimistic, pure, simple" },
-  { id: "Jester",   description: "Playful, humorous, light" },
-  { id: "Lover",    description: "Passionate, sensual, intimate" },
-  { id: "Rebel",    description: "Disruptive, radical, revolutionary" },
+  { id: "Jester", description: "Playful, humorous, light" },
+  { id: "Lover", description: "Passionate, sensual, intimate" },
+  { id: "Rebel", description: "Disruptive, radical, revolutionary" },
   { id: "Everyman", description: "Relatable, real, down-to-earth" },
   { id: "Magician", description: "Transformative, visionary, inspiring" },
 ];
 
-function StrategyEditor({ data, setData, openAssetPicker }: { 
-  data: Partial<BrandStrategy>; 
+function StrategyEditor({ data, setData, openAssetPicker }: {
+  data: Partial<BrandStrategy>;
   setData: (d: any) => void;
   openAssetPicker?: (cat: AssetCategory, onSelect: (url: string) => void) => void;
 }) {
   const set = (key: string, val: any) => setData({ ...data, [key]: val });
-  const tov         = data.toneOfVoice    || { descriptors: [], dos: [], donts: [] };
+  const tov = data.toneOfVoice || { descriptors: [], dos: [], donts: [] };
   const personality = data.brandPersonality || { archetype: null, adjectives: [], antiAdjectives: [] };
-  const audience    = data.targetAudience || { primary: { description: "", ageRange: "", behaviors: "" }, secondary: null };
+  const audience = data.targetAudience || { primary: { description: "", ageRange: "", behaviors: "" }, secondary: null };
 
   return (
     <div className="space-y-5">
@@ -602,10 +605,10 @@ function StrategyEditor({ data, setData, openAssetPicker }: {
 // ─── 03 LOGO EDITOR ──────────────────────────────────────────────────────────
 
 const VARIANT_CONFIGS: { type: LogoVariantType; label: string; defaultBg: string }[] = [
-  { type: "full_color",  label: "Full Color",  defaultBg: "#FFFFFF" },
-  { type: "reversed",    label: "Reversed",    defaultBg: "#0F0F0F" },
-  { type: "monochrome",  label: "Monochrome",  defaultBg: "#FFFFFF" },
-  { type: "outline",     label: "Outline",     defaultBg: "#F5F5F5" },
+  { type: "full_color", label: "Full Color", defaultBg: "#FFFFFF" },
+  { type: "reversed", label: "Reversed", defaultBg: "#0F0F0F" },
+  { type: "monochrome", label: "Monochrome", defaultBg: "#FFFFFF" },
+  { type: "outline", label: "Outline", defaultBg: "#F5F5F5" },
 ];
 
 function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
@@ -614,9 +617,9 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
 }) {
   const [tab, setTab] = useState<"variants" | "rules" | "misuse">("variants");
   const set = (key: string, val: any) => onChange({ ...logo, [key]: val });
-  const variants  = logo.variants || VARIANT_CONFIGS.map((c) => ({ variantType: c.type, fileUrl: null, downloadUrl: null, previewBgColor: c.defaultBg }));
+  const variants = logo.variants || VARIANT_CONFIGS.map((c) => ({ variantType: c.type, fileUrl: null, downloadUrl: null, previewBgColor: c.defaultBg }));
   const clearSpace = logo.clearSpace || { unit: "x-height" as const, value: 1, description: "", diagramUrl: null };
-  const misuse     = logo.misuseExamples || [];
+  const misuse = logo.misuseExamples || [];
 
   return (
     <div className="border border-[var(--border-subtle)]">
@@ -662,9 +665,9 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
                       </div>
                     </div>
                     <div style={{ background: v.previewBgColor || config.defaultBg }}>
-                      <UploadZone 
-                        value={v.fileUrl || null} 
-                        onChange={(val) => updateVariant({ fileUrl: val })} 
+                      <UploadZone
+                        value={v.fileUrl || null}
+                        onChange={(val) => updateVariant({ fileUrl: val })}
                         height={100}
                         onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_logos', (url) => updateVariant({ fileUrl: url })) : undefined}
                       />
@@ -736,10 +739,10 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
             <p className="text-sm text-[var(--text-secondary)]">Upload examples of incorrect logo usage. Label each one clearly.</p>
             {misuse.map((ex, i) => (
               <div key={i} className="grid grid-cols-2 gap-3 items-start border border-[var(--border-subtle)] p-3">
-                <UploadZone 
-                  value={ex.imageUrl || null} 
-                  onChange={(v) => { const updated = [...misuse]; updated[i] = { ...ex, imageUrl: v || "" }; set("misuseExamples", updated); }} 
-                  height={100} 
+                <UploadZone
+                  value={ex.imageUrl || null}
+                  onChange={(v) => { const updated = [...misuse]; updated[i] = { ...ex, imageUrl: v || "" }; set("misuseExamples", updated); }}
+                  height={100}
                   onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_logos', (url) => {
                     const updated = [...misuse];
                     updated[i] = { ...ex, imageUrl: url };
@@ -764,13 +767,13 @@ function LogoCard({ logo, onChange, onRemove, openAssetPicker }: {
   );
 }
 
-function LogoEditor({ data, setData, openAssetPicker }: { 
-  data: { logos?: Partial<BrandLogo>[] }; 
+function LogoEditor({ data, setData, openAssetPicker }: {
+  data: { logos?: Partial<BrandLogo>[] };
   setData: (d: any) => void;
   openAssetPicker?: (cat: AssetCategory, onSelect: (url: string) => void) => void;
 }) {
   const logos = data.logos || [];
-  const addLogo    = () => setData({ ...data, logos: [...logos, { id: String(Date.now()), label: "New Logo", sortOrder: logos.length }] });
+  const addLogo = () => setData({ ...data, logos: [...logos, { id: String(Date.now()), label: "New Logo", sortOrder: logos.length }] });
   const removeLogo = (i: number) => setData({ ...data, logos: logos.filter((_, j) => j !== i) });
   const updateLogo = (i: number, updated: Partial<BrandLogo>) => { const next = [...logos]; next[i] = updated; setData({ ...data, logos: next }); };
 
@@ -784,12 +787,12 @@ function LogoEditor({ data, setData, openAssetPicker }: {
         </div>
       )}
       {logos.map((logo, i) => (
-        <LogoCard 
-          key={logo.id || i} 
-          logo={logo} 
-          index={i} 
-          onChange={(updated) => updateLogo(i, updated)} 
-          onRemove={() => removeLogo(i)} 
+        <LogoCard
+          key={logo.id || i}
+          logo={logo}
+          index={i}
+          onChange={(updated) => updateLogo(i, updated)}
+          onRemove={() => removeLogo(i)}
           openAssetPicker={openAssetPicker}
         />
       ))}
@@ -875,7 +878,7 @@ function ColorCard({ color, onChange, onRemove }: {
   color: Partial<BrandColor>; onChange: (c: Partial<BrandColor>) => void; onRemove: () => void;
 }) {
   const set = (key: string, val: any) => onChange({ ...color, [key]: val });
-  const hex       = color.hex || "#000000";
+  const hex = color.hex || "#000000";
   const onColorHex = color.onColor || "#FFFFFF";
   const [showPicker, setShowPicker] = useState(false);
   const [showTints, setShowTints] = useState(false);
@@ -921,7 +924,7 @@ function ColorCard({ color, onChange, onRemove }: {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute top-full left-0 mt-2 z-50 border shadow-2xl p-3"
+              className="absolute top-full left-0 mt-2 z-50 border shadow-2xl p-3 max-w-[min(240px,calc(100vw-2rem))]"
               style={{ background: "var(--bg-secondary)", borderColor: "var(--bg-quaternary)", minWidth: 220 }}
             >
               <HexColorPicker color={hex.startsWith("#") ? hex : "#888888"} onChange={handleHexChange} style={{ width: "100%" }} />
@@ -1015,10 +1018,10 @@ function ColorCard({ color, onChange, onRemove }: {
             <FieldLabel>Usage Role</FieldLabel>
             <SelectField value={color.usageRole || ""} onChange={(v) => set("usageRole", v as ColorUsageRole)} placeholder="Select role"
               options={[
-                { value: "background", label: "Background" }, { value: "text",    label: "Text" },
-                { value: "cta",        label: "CTA / Button" }, { value: "accent", label: "Accent" },
-                { value: "border",     label: "Border" },    { value: "surface",  label: "Surface" },
-                { value: "general",    label: "General" },
+                { value: "background", label: "Background" }, { value: "text", label: "Text" },
+                { value: "cta", label: "CTA / Button" }, { value: "accent", label: "Accent" },
+                { value: "border", label: "Border" }, { value: "surface", label: "Surface" },
+                { value: "general", label: "General" },
               ]}
             />
           </div>
@@ -1113,14 +1116,14 @@ function PaletteOverviewStrip({ colors }: { colors: Partial<BrandColor>[] }) {
 
 function ColorEditor({ data, setData }: { data: { colors?: Partial<BrandColor>[] }; setData: (d: any) => void }) {
   const colors = data.colors || [];
-  const addColor     = () => setData({ ...data, colors: [...colors, { id: String(Date.now()), hex: "#C9A96E", colorName: "", paletteType: "primary" as const, isPrimary: false, sortOrder: colors.length }] });
-  const updateColor  = (i: number, updated: Partial<BrandColor>) => { const next = [...colors]; next[i] = updated; setData({ ...data, colors: next }); };
-  const removeColor  = (i: number) => setData({ ...data, colors: colors.filter((_, j) => j !== i) });
+  const addColor = () => setData({ ...data, colors: [...colors, { id: String(Date.now()), hex: "#C9A96E", colorName: "", paletteType: "primary" as const, isPrimary: false, sortOrder: colors.length }] });
+  const updateColor = (i: number, updated: Partial<BrandColor>) => { const next = [...colors]; next[i] = updated; setData({ ...data, colors: next }); };
+  const removeColor = (i: number) => setData({ ...data, colors: colors.filter((_, j) => j !== i) });
 
   const groups = {
-    primary:   colors.filter((c) => c.paletteType === "primary"),
+    primary: colors.filter((c) => c.paletteType === "primary"),
     secondary: colors.filter((c) => c.paletteType === "secondary"),
-    neutral:   colors.filter((c) => c.paletteType === "neutral"),
+    neutral: colors.filter((c) => c.paletteType === "neutral"),
   };
 
   return (
@@ -1177,13 +1180,13 @@ const FONT_WEIGHT_OPTIONS: { value: FontWeight; label: string }[] = [
 ];
 
 const TYPE_SCALE_KEYS = [
-  { key: "display",   label: "Display",    sample: "Brand Identity",          size: 48 },
-  { key: "h1",        label: "H1",         sample: "Strategic Vision",        size: 36 },
-  { key: "h2",        label: "H2",         sample: "Visual Identity System",  size: 28 },
-  { key: "h3",        label: "H3",         sample: "Core Brand Principles",   size: 22 },
-  { key: "body1",     label: "Body",       sample: "Every visual decision reinforces a single strategic truth.", size: 16 },
-  { key: "caption",   label: "Caption",    sample: "Typography is the voice of the brand.", size: 13 },
-  { key: "overline",  label: "UI / Label", sample: "BUTTON · NAVIGATION · FORM LABEL", size: 12 },
+  { key: "display", label: "Display", sample: "Brand Identity", size: 48 },
+  { key: "h1", label: "H1", sample: "Strategic Vision", size: 36 },
+  { key: "h2", label: "H2", sample: "Visual Identity System", size: 28 },
+  { key: "h3", label: "H3", sample: "Core Brand Principles", size: 22 },
+  { key: "body1", label: "Body", sample: "Every visual decision reinforces a single strategic truth.", size: 16 },
+  { key: "caption", label: "Caption", sample: "Typography is the voice of the brand.", size: 13 },
+  { key: "overline", label: "UI / Label", sample: "BUTTON · NAVIGATION · FORM LABEL", size: 12 },
 ];
 
 const POPULAR_GOOGLE_FONTS = [
@@ -1228,14 +1231,14 @@ async function loadFontFromZip(file: File, fontFamilyName: string): Promise<void
       const ff = new FontFace(fontFamilyName, data, { weight: "100 900" });
       await ff.load(); document.fonts.add(ff); continue;
     }
-    if      (lower.includes("thin"))        weight = "100";
-    else if (lower.includes("extralight"))  weight = "200";
-    else if (lower.includes("light"))       weight = "300";
-    else if (lower.includes("medium"))      weight = "500";
-    else if (lower.includes("semibold"))    weight = "600";
-    else if (lower.includes("extrabold"))   weight = "800";
-    else if (lower.includes("black"))       weight = "900";
-    else if (lower.includes("bold"))        weight = "700";
+    if (lower.includes("thin")) weight = "100";
+    else if (lower.includes("extralight")) weight = "200";
+    else if (lower.includes("light")) weight = "300";
+    else if (lower.includes("medium")) weight = "500";
+    else if (lower.includes("semibold")) weight = "600";
+    else if (lower.includes("extrabold")) weight = "800";
+    else if (lower.includes("black")) weight = "900";
+    else if (lower.includes("bold")) weight = "700";
     const ff = new FontFace(fontFamilyName, data, { weight });
     await ff.load(); document.fonts.add(ff);
   }
@@ -1245,8 +1248,8 @@ function TypographyCard({ font, onChange, onRemove }: {
   font: Partial<BrandTypography>; onChange: (f: Partial<BrandTypography>) => void; onRemove: () => void;
 }) {
   const set = (key: string, val: any) => onChange({ ...font, [key]: val });
-  const weights       = font.weights || [];
-  const scale         = font.typeScale || {};
+  const weights = font.weights || [];
+  const scale = font.typeScale || {};
   const [showScale, setShowScale] = useState(false);
   const [fontStatus, setFontStatus] = useState<"idle" | "loading" | "loaded" | "not-found" | "zip-loaded" | "error">("idle");
   const [previewText, setPreviewText] = useState(font.previewSentence || "The quick brown fox jumps over the lazy dog");
@@ -1333,9 +1336,9 @@ function TypographyCard({ font, onChange, onRemove }: {
             <SelectField value={font.fontRole || "body"} onChange={(v) => set("fontRole", v)}
               options={[
                 { value: "display", label: "Display / Heading" },
-                { value: "body",    label: "Body / UI" },
-                { value: "accent",  label: "Accent / Editorial" },
-                { value: "mono",    label: "Monospace / Code" },
+                { value: "body", label: "Body / UI" },
+                { value: "accent", label: "Accent / Editorial" },
+                { value: "mono", label: "Monospace / Code" },
               ]}
             />
           </div>
@@ -1364,8 +1367,8 @@ function TypographyCard({ font, onChange, onRemove }: {
             {zipLoading
               ? <span className="flex items-center gap-1.5 text-xs text-[var(--text-tertiary)]"><Loader2 className="w-4 h-4 animate-spin" /> Loading fonts from ZIP...</span>
               : <span className="flex items-center gap-2 text-xs px-3 py-2 bg-[var(--surface-subtle)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--hs-accent)] transition-colors">
-                  <Upload className="w-3.5 h-3.5" /> Upload ZIP
-                </span>
+                <Upload className="w-3.5 h-3.5" /> Upload ZIP
+              </span>
             }
             <input ref={zipRef} type="file" accept=".zip" className="hidden" disabled={zipLoading}
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleZipUpload(f); }} />
@@ -1504,8 +1507,8 @@ function TypographyCard({ font, onChange, onRemove }: {
 }
 
 function TypographyEditor({ data, setData }: { data: { fonts?: Partial<BrandTypography>[] }; setData: (d: any) => void }) {
-  const fonts     = data.fonts || [];
-  const addFont   = () => setData({ ...data, fonts: [...fonts, { id: String(Date.now()), fontName: "", fontRole: "body" as const, weights: [400, 700], sortOrder: fonts.length }] });
+  const fonts = data.fonts || [];
+  const addFont = () => setData({ ...data, fonts: [...fonts, { id: String(Date.now()), fontName: "", fontRole: "body" as const, weights: [400, 700], sortOrder: fonts.length }] });
   const removeFont = (i: number) => setData({ ...data, fonts: fonts.filter((_, j) => j !== i) });
   const updateFont = (i: number, updated: Partial<BrandTypography>) => { const next = [...fonts]; next[i] = updated; setData({ ...data, fonts: next }); };
 
@@ -1531,17 +1534,17 @@ function TypographyEditor({ data, setData }: { data: { fonts?: Partial<BrandTypo
 // ─── 06 IMAGES EDITOR ────────────────────────────────────────────────────────
 
 const PHOTOGRAPHY_STYLE_PRESETS = ["candid", "natural_light", "high_contrast", "documentary", "editorial", "lifestyle", "product", "architectural", "portrait", "aerial", "black_and_white", "film_grain"];
-const MOOD_DESCRIPTOR_PRESETS   = ["warm", "aspirational", "grounded", "energetic", "serene", "bold", "intimate", "expansive", "minimal", "dramatic", "playful", "sophisticated"];
+const MOOD_DESCRIPTOR_PRESETS = ["warm", "aspirational", "grounded", "energetic", "serene", "bold", "intimate", "expansive", "minimal", "dramatic", "playful", "sophisticated"];
 
-function ImagesEditor({ data, setData, openAssetPicker }: { 
-  data: Partial<BrandImages>; 
+function ImagesEditor({ data, setData, openAssetPicker }: {
+  data: Partial<BrandImages>;
   setData: (d: any) => void;
   openAssetPicker?: (cat: AssetCategory, onSelect: (url: string) => void) => void;
 }) {
   const set = (key: string, val: any) => setData({ ...data, [key]: val });
   const heroImages = data.heroImages || [];
-  const gallery    = data.galleryImages || [];
-  const doDonts    = data.doDonts || [];
+  const gallery = data.galleryImages || [];
+  const doDonts = data.doDonts || [];
 
   return (
     <div className="space-y-5">
@@ -1614,10 +1617,10 @@ function ImagesEditor({ data, setData, openAssetPicker }: {
         <div className="space-y-4 pt-3">
           {heroImages.map((img, i) => (
             <div key={i} className="border border-[var(--border-subtle)] p-3 space-y-3">
-              <UploadZone 
-                value={img.url || null} 
-                onChange={(v) => { const u = [...heroImages]; u[i] = { ...img, url: v || "" }; set("heroImages", u); }} 
-                height={160} 
+              <UploadZone
+                value={img.url || null}
+                onChange={(v) => { const u = [...heroImages]; u[i] = { ...img, url: v || "" }; set("heroImages", u); }}
+                height={160}
                 onLibraryClick={openAssetPicker ? () => openAssetPicker('photography', (url) => {
                   const u = [...heroImages];
                   u[i] = { ...img, url: url };
@@ -1643,13 +1646,13 @@ function ImagesEditor({ data, setData, openAssetPicker }: {
 
       <Accordion title="Gallery" defaultOpen={false}>
         <div className="space-y-3 pt-3">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {gallery.map((img, i) => (
               <div key={i} className={cn("relative group", img.colSpan === 2 ? "col-span-2" : "col-span-1")}>
-                <UploadZone 
-                  value={img.url || null} 
-                  onChange={(v) => { const u = [...gallery]; u[i] = { ...img, url: v || "" }; set("galleryImages", u); }} 
-                  height={120} 
+                <UploadZone
+                  value={img.url || null}
+                  onChange={(v) => { const u = [...gallery]; u[i] = { ...img, url: v || "" }; set("galleryImages", u); }}
+                  height={120}
                   onLibraryClick={openAssetPicker ? () => openAssetPicker('photography', (url) => {
                     const u = [...gallery];
                     u[i] = { ...img, url: url };
@@ -1679,10 +1682,10 @@ function ImagesEditor({ data, setData, openAssetPicker }: {
                   <button onClick={() => { const u = [...doDonts]; u[i] = { ...item, type: "do" }; set("doDonts", u); }} className={cn("px-3 py-1.5 text-xs font-medium border", item.type === "do" ? "bg-emerald-600 text-white border-emerald-600" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]")}>Do ✓</button>
                   <button onClick={() => { const u = [...doDonts]; u[i] = { ...item, type: "dont" }; set("doDonts", u); }} className={cn("px-3 py-1.5 text-xs font-medium border", item.type === "dont" ? "bg-red-600 text-white border-red-600" : "border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]")}>Don't ✗</button>
                 </div>
-                <UploadZone 
-                  value={item.imageUrl || null} 
-                  onChange={(v) => { const u = [...doDonts]; u[i] = { ...item, imageUrl: v || "" }; set("doDonts", u); }} 
-                  height={100} 
+                <UploadZone
+                  value={item.imageUrl || null}
+                  onChange={(v) => { const u = [...doDonts]; u[i] = { ...item, imageUrl: v || "" }; set("doDonts", u); }}
+                  height={100}
                   onLibraryClick={openAssetPicker ? () => openAssetPicker('photography', (url) => {
                     const u = [...doDonts];
                     u[i] = { ...item, imageUrl: url };
@@ -1707,20 +1710,20 @@ function ImagesEditor({ data, setData, openAssetPicker }: {
 // ─── 07 ICONS EDITOR ─────────────────────────────────────────────────────────
 
 const ICON_STYLE_OPTIONS: { id: IconStyle; label: string; description: string }[] = [
-  { id: "outline",   label: "Outline",   description: "Clean stroke-based" },
-  { id: "filled",    label: "Filled",    description: "Solid shapes" },
-  { id: "duotone",   label: "Duotone",   description: "Two-tone layered" },
-  { id: "flat",      label: "Flat",      description: "Minimal, no depth" },
-  { id: "custom",    label: "Custom",    description: "Bespoke system" },
+  { id: "outline", label: "Outline", description: "Clean stroke-based" },
+  { id: "filled", label: "Filled", description: "Solid shapes" },
+  { id: "duotone", label: "Duotone", description: "Two-tone layered" },
+  { id: "flat", label: "Flat", description: "Minimal, no depth" },
+  { id: "custom", label: "Custom", description: "Bespoke system" },
 ];
 
-function IconsEditor({ data, setData, openAssetPicker }: { 
-  data: Partial<BrandIcons>; 
+function IconsEditor({ data, setData, openAssetPicker }: {
+  data: Partial<BrandIcons>;
   setData: (d: any) => void;
   openAssetPicker?: (cat: AssetCategory, onSelect: (url: string) => void) => void;
 }) {
   const set = (key: string, val: any) => setData({ ...data, [key]: val });
-  const symbols  = data.productSymbols || [];
+  const symbols = data.productSymbols || [];
   const sizeGuide = data.sizeGuidelines || { minimumPx: 16, gridUnit: 24, preferredSizes: [16, 24, 32, 48] };
 
   return (
@@ -1756,7 +1759,7 @@ function IconsEditor({ data, setData, openAssetPicker }: {
               <TextInput value={data.cornerRadius || ""} onChange={(v) => set("cornerRadius", v)} placeholder="e.g. Sharp corners, or 2px radius" />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div><FieldLabel>Min Size</FieldLabel><NumberInput value={sizeGuide.minimumPx} onChange={(v) => set("sizeGuidelines", { ...sizeGuide, minimumPx: v })} min={8} unit="px" /></div>
             <div><FieldLabel>Grid Unit</FieldLabel><NumberInput value={sizeGuide.gridUnit} onChange={(v) => set("sizeGuidelines", { ...sizeGuide, gridUnit: v })} min={8} unit="px" /></div>
             <div>
@@ -1780,7 +1783,7 @@ function IconsEditor({ data, setData, openAssetPicker }: {
                 <TextInput value={sym.name || ""} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, name: v }; set("productSymbols", u); }} placeholder="Symbol name" className="max-w-xs" />
                 <button onClick={() => set("productSymbols", symbols.filter((_, j) => j !== i))} className="p-1 text-[var(--text-tertiary)] hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2 min-w-0">
                 <div><FieldLabel>Original</FieldLabel><UploadZone value={sym.originalUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, originalUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => { const u = [...symbols]; u[i] = { ...sym, originalUrl: url }; set("productSymbols", u); }) : undefined} /></div>
                 <div style={{ background: "#111" }}><FieldLabel>Black Version</FieldLabel><UploadZone value={sym.blackUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, blackUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => { const u = [...symbols]; u[i] = { ...sym, blackUrl: url }; set("productSymbols", u); }) : undefined} /></div>
                 <div style={{ background: "#000" }}><FieldLabel>White Version</FieldLabel><UploadZone value={sym.whiteUrl || null} onChange={(v) => { const u = [...symbols]; u[i] = { ...sym, whiteUrl: v || "" }; set("productSymbols", u); }} height={80} onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_icons', (url) => { const u = [...symbols]; u[i] = { ...sym, whiteUrl: url }; set("productSymbols", u); }) : undefined} /></div>
@@ -1817,13 +1820,13 @@ function IconsEditor({ data, setData, openAssetPicker }: {
 // ─── 08 RESOURCES EDITOR ─────────────────────────────────────────────────────
 
 const FILE_TYPE_OPTIONS = [
-  { value: "logo_suite",    label: "Logo Suite",    icon: "🎨" },
-  { value: "typeface",      label: "Typeface",      icon: "Aa" },
-  { value: "image_set",     label: "Image Set",     icon: "🖼" },
-  { value: "icon_library",  label: "Icon Library",  icon: "◻" },
-  { value: "template",      label: "Template",      icon: "📄" },
-  { value: "guide",         label: "Guide / PDF",   icon: "📋" },
-  { value: "other",         label: "Other",         icon: "📦" },
+  { value: "logo_suite", label: "Logo Suite", icon: "🎨" },
+  { value: "typeface", label: "Typeface", icon: "Aa" },
+  { value: "image_set", label: "Image Set", icon: "🖼" },
+  { value: "icon_library", label: "Icon Library", icon: "◻" },
+  { value: "template", label: "Template", icon: "📄" },
+  { value: "guide", label: "Guide / PDF", icon: "📋" },
+  { value: "other", label: "Other", icon: "📦" },
 ];
 
 function ResourceCard({ resource, onChange, onRemove, openAssetPicker }: {
@@ -1835,10 +1838,10 @@ function ResourceCard({ resource, onChange, onRemove, openAssetPicker }: {
     <div className="border border-[var(--border-subtle)] overflow-hidden">
       <div className="grid grid-cols-[100px_1fr] gap-0 sm:grid-cols-[120px_1fr]">
         <div className="border-r border-[var(--border-subtle)]">
-          <UploadZone 
-            value={resource.thumbnailUrl || null} 
-            onChange={(v) => set("thumbnailUrl", v)} 
-            height={130} 
+          <UploadZone
+            value={resource.thumbnailUrl || null}
+            onChange={(v) => set("thumbnailUrl", v)}
+            height={130}
             onLibraryClick={openAssetPicker ? () => openAssetPicker('brand_resources', (url) => set("thumbnailUrl", url)) : undefined}
           />
         </div>
@@ -1854,7 +1857,7 @@ function ResourceCard({ resource, onChange, onRemove, openAssetPicker }: {
             <input type="url" value={resource.fileUrl || ""} onChange={(e) => set("fileUrl", e.target.value)} placeholder="https://..."
               className="w-full pl-9 pr-12 py-2.5 bg-[var(--bg-primary)] border border-[var(--border-default)] text-sm focus:outline-none focus:border-[var(--hs-accent)] placeholder:italic placeholder:text-[var(--text-muted)]" />
             {openAssetPicker && (
-              <button 
+              <button
                 onClick={() => openAssetPicker('brand_resources', (url) => set("fileUrl", url))}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[var(--text-tertiary)] hover:text-[var(--hs-accent)] transition-colors"
                 title="Select from Library"
@@ -1869,13 +1872,13 @@ function ResourceCard({ resource, onChange, onRemove, openAssetPicker }: {
   );
 }
 
-function ResourcesEditor({ data, setData, openAssetPicker }: { 
-  data: { resources?: Partial<BrandResource>[] }; 
+function ResourcesEditor({ data, setData, openAssetPicker }: {
+  data: { resources?: Partial<BrandResource>[] };
   setData: (d: any) => void;
   openAssetPicker?: (cat: AssetCategory, onSelect: (url: string) => void) => void;
 }) {
   const resources = data.resources || [];
-  const addResource    = () => setData({ ...data, resources: [...resources, { id: String(Date.now()), label: "", sortOrder: resources.length }] });
+  const addResource = () => setData({ ...data, resources: [...resources, { id: String(Date.now()), label: "", sortOrder: resources.length }] });
   const removeResource = (i: number) => setData({ ...data, resources: resources.filter((_, j) => j !== i) });
   const updateResource = (i: number, updated: Partial<BrandResource>) => { const next = [...resources]; next[i] = updated; setData({ ...data, resources: next }); };
 
@@ -1889,11 +1892,11 @@ function ResourcesEditor({ data, setData, openAssetPicker }: {
         </div>
       )}
       {resources.map((res, i) => (
-        <ResourceCard 
-          key={res.id || i} 
-          resource={res} 
-          onChange={(updated) => updateResource(i, updated)} 
-          onRemove={() => removeResource(i)} 
+        <ResourceCard
+          key={res.id || i}
+          resource={res}
+          onChange={(updated) => updateResource(i, updated)}
+          onRemove={() => removeResource(i)}
           openAssetPicker={openAssetPicker}
         />
       ))}
@@ -1908,7 +1911,7 @@ function ResourcesEditor({ data, setData, openAssetPicker }: {
 
 function VoiceToneEditor({ data, setData }: { data: Partial<BrandStrategy>; setData: (d: any) => void }) {
   const set = (key: string, val: any) => setData({ ...data, [key]: val });
-  const tov         = data.toneOfVoice || { descriptors: [], dos: [], donts: [] };
+  const tov = data.toneOfVoice || { descriptors: [], dos: [], donts: [] };
   const personality = data.brandPersonality || { archetype: null, adjectives: [], antiAdjectives: [] };
 
   return (
@@ -1964,7 +1967,7 @@ function VoiceToneEditor({ data, setData }: { data: Partial<BrandStrategy>; setD
 
 function MessagingEditor({ data, setData }: { data: Partial<BrandStrategy>; setData: (d: any) => void }) {
   const set = (key: string, val: any) => setData({ ...data, [key]: val });
-  const msg    = data.messaging || { headline: null, taglines: [], keyMessages: [], ctaGuidelines: null };
+  const msg = data.messaging || { headline: null, taglines: [], keyMessages: [], ctaGuidelines: null };
   const setMsg = (k: string, v: any) => set("messaging", { ...msg, [k]: v });
 
   return (
@@ -2013,21 +2016,21 @@ function MessagingEditor({ data, setData }: { data: Partial<BrandStrategy>; setD
 
 // ─── Editor Registry ──────────────────────────────────────────────────────────
 
-const sectionEditors: Record<SupabaseSectionType, React.FC<{ 
-  data: any; 
+const sectionEditors: Record<SupabaseSectionType, React.FC<{
+  data: any;
   setData: (d: any) => void;
   openAssetPicker?: (category: AssetCategory, onSelect: (url: string) => void) => void;
 }>> = {
-  introduction:  IntroductionEditor,
-  strategy:      StrategyEditor,
-  logo:          LogoEditor,
+  introduction: IntroductionEditor,
+  strategy: StrategyEditor,
+  logo: LogoEditor,
   color_palette: ColorEditor,
-  typography:    TypographyEditor,
-  photography:   ImagesEditor,
-  voice_tone:    VoiceToneEditor,
-  messaging:     MessagingEditor,
-  icons:         IconsEditor,
-  resources:     ResourcesEditor,
+  typography: TypographyEditor,
+  photography: ImagesEditor,
+  voice_tone: VoiceToneEditor,
+  messaging: MessagingEditor,
+  icons: IconsEditor,
+  resources: ResourcesEditor,
 };
 
 // ─── Completion Score ─────────────────────────────────────────────────────────
@@ -2035,16 +2038,16 @@ const sectionEditors: Record<SupabaseSectionType, React.FC<{
 function sectionCompletion(id: SupabaseSectionType, data: any): number {
   if (!data || Object.keys(data).length === 0) return 0;
   const checks: Record<SupabaseSectionType, () => boolean> = {
-    introduction:  () => !!(data.tagline && data.brandDescription && data.coverImageUrl),
-    strategy:      () => !!(data.mission && data.vision && data.toneOfVoice?.descriptors?.length),
-    logo:          () => !!(data.logos?.length > 0 && data.logos[0]?.variants?.some((v: any) => v.fileUrl)),
+    introduction: () => !!(data.tagline && data.brandDescription && data.coverImageUrl),
+    strategy: () => !!(data.mission && data.vision && data.toneOfVoice?.descriptors?.length),
+    logo: () => !!(data.logos?.length > 0 && data.logos[0]?.variants?.some((v: any) => v.fileUrl)),
     color_palette: () => !!(data.colors?.length > 0),
-    typography:    () => !!(data.fonts?.length > 0 && data.fonts[0]?.fontName),
-    photography:   () => !!(data.directionBody && data.heroImages?.length > 0),
-    voice_tone:    () => !!(data.toneOfVoice?.descriptors?.length > 0),
-    messaging:     () => !!(data.messaging?.headline || data.messaging?.keyMessages?.length > 0),
-    icons:         () => !!(data.iconStyle || data.iconLibraryName || data.productSymbols?.length > 0),
-    resources:     () => !!(data.resources?.length > 0),
+    typography: () => !!(data.fonts?.length > 0 && data.fonts[0]?.fontName),
+    photography: () => !!(data.directionBody && data.heroImages?.length > 0),
+    voice_tone: () => !!(data.toneOfVoice?.descriptors?.length > 0),
+    messaging: () => !!(data.messaging?.headline || data.messaging?.keyMessages?.length > 0),
+    icons: () => !!(data.iconStyle || data.iconLibraryName || data.productSymbols?.length > 0),
+    resources: () => !!(data.resources?.length > 0),
   };
   return checks[id]() ? 100 : (data && Object.values(data).some(Boolean)) ? 50 : 0;
 }
@@ -2054,10 +2057,10 @@ function sectionCompletion(id: SupabaseSectionType, data: any): number {
 export function BrandDocument() {
   const { project } = useOutletContext<OverviewContext>();
   const [activeSection, setActiveSection] = useState<SupabaseSectionType>("introduction");
-  const [showSettings, setShowSettings]   = useState(false);
-  const [sidebarOpen, setSidebarOpen]     = useState(false);  // mobile drawer
-  const [sectionData, setSectionData]     = useState<Record<string, any>>({});
-  const [pickerConfig, setPickerConfig]   = useState<{
+  const [showSettings, setShowSettings] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);  // mobile drawer
+  const [sectionData, setSectionData] = useState<Record<string, any>>({});
+  const [pickerConfig, setPickerConfig] = useState<{
     isOpen: boolean;
     category?: AssetCategory;
     onSelect?: (url: string) => void;
@@ -2102,8 +2105,8 @@ export function BrandDocument() {
     return () => clearTimeout(t);
   }, [unsavedChanges, handleSave]);
 
-  const currentData       = sectionData[activeSection] ?? {};
-  const ActiveEditor      = sectionEditors[activeSection];
+  const currentData = sectionData[activeSection] ?? {};
+  const ActiveEditor = sectionEditors[activeSection];
   const activeSectionMeta = sections.find((s) => s.id === activeSection);
 
   const handleEditorDataChange = (data: Record<string, unknown>) => {
@@ -2112,13 +2115,13 @@ export function BrandDocument() {
   };
 
   const handlePublish = async () => {
-    const logoData  = sectionData.logo  as { logos?:  unknown[] } | undefined;
+    const logoData = sectionData.logo as { logos?: unknown[] } | undefined;
     const colorData = sectionData.color_palette as { colors?: unknown[] } | undefined;
-    const introData = sectionData.introduction  as { tagline?: string }   | undefined;
-    const hasLogo  = (logoData?.logos?.length  ?? 0) > 0;
+    const introData = sectionData.introduction as { tagline?: string } | undefined;
+    const hasLogo = (logoData?.logos?.length ?? 0) > 0;
     const hasColor = (colorData?.colors?.length ?? 0) > 0;
     const hasIntro = !!introData?.tagline;
-    if (!hasLogo)  { showToast("Add at least one logo before publishing", "error"); return; }
+    if (!hasLogo) { showToast("Add at least one logo before publishing", "error"); return; }
     if (!hasColor) { showToast("Add at least one colour before publishing", "error"); return; }
     if (!hasIntro) { showToast("Add a tagline before publishing", "error"); return; }
     try {
@@ -2129,7 +2132,7 @@ export function BrandDocument() {
   };
 
   const completedCount = sections.filter((s) => sectionCompletion(s.id, sectionData[s.id]) === 100).length;
-  const completionPct  = Math.round((completedCount / sections.length) * 100);
+  const completionPct = Math.round((completedCount / sections.length) * 100);
 
 
   return (
@@ -2233,9 +2236,9 @@ export function BrandDocument() {
         {/* Nav Items */}
         <nav className="flex-1 overflow-auto py-2">
           {sections.map((section) => {
-            const Icon       = section.icon;
-            const isActive   = activeSection === section.id;
-            const data       = sectionData[section.id];
+            const Icon = section.icon;
+            const isActive = activeSection === section.id;
+            const data = sectionData[section.id];
             const completion = sectionCompletion(section.id, data);
 
             return (
@@ -2257,7 +2260,7 @@ export function BrandDocument() {
                 <div className={cn(
                   "w-1.5 h-1.5 rounded-full flex-shrink-0 md:hidden lg:block",
                   completion === 100 ? (isActive ? "bg-emerald-300" : "bg-emerald-500") :
-                  completion === 50  ? (isActive ? "bg-amber-300"   : "bg-amber-400")   : "bg-transparent"
+                    completion === 50 ? (isActive ? "bg-amber-300" : "bg-amber-400") : "bg-transparent"
                 )} />
               </button>
             );
@@ -2291,21 +2294,32 @@ export function BrandDocument() {
             >
               <Menu className="w-4 h-4" />
             </button>
-            <span className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider hidden sm:block">Document</span>
-            <ChevronRight className="w-3.5 h-3.5 text-[var(--text-tertiary)] hidden sm:block" />
-            <span className="font-semibold text-sm text-[var(--text-primary)] truncate">{activeSectionMeta?.label}</span>
-            {/* Save indicator */}
-            {saveIndicator === "saving" ? (
-              <span className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] italic ml-2 flex-shrink-0">
-                <RefreshCw className="w-3 h-3 animate-spin" /> Saving...
-              </span>
-            ) : saveIndicator === "saved" ? (
-              <span className="flex items-center gap-1 text-xs text-emerald-600 ml-2 flex-shrink-0">
-                <Check className="w-3 h-3" /> Saved
-              </span>
-            ) : unsavedChanges ? (
-              <span className="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 ml-2 flex-shrink-0 hidden sm:block">Unsaved</span>
-            ) : null}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider hidden sm:block">Document</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[var(--text-tertiary)] hidden sm:block" />
+                <span className="font-semibold text-sm text-[var(--text-primary)] truncate">{activeSectionMeta?.label}</span>
+                {/* Save indicator */}
+                {saveIndicator === "saving" ? (
+                  <span className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] italic ml-1 flex-shrink-0">
+                    <RefreshCw className="w-3 h-3 animate-spin" /> Saving...
+                  </span>
+                ) : saveIndicator === "saved" ? (
+                  <span className="flex items-center gap-1 text-xs text-emerald-600 ml-1 flex-shrink-0">
+                    <Check className="w-3 h-3" /> Saved
+                  </span>
+                ) : unsavedChanges ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 ml-1 flex-shrink-0 sm:hidden" />
+                    <span className="px-2 py-0.5 text-xs bg-amber-100 text-amber-700 ml-1 flex-shrink-0 hidden sm:block">Unsaved</span>
+                  </>
+                ) : null}
+              </div>
+              {/* Description: visible on mobile below label, on desktop in its own banner */}
+              {activeSectionMeta && (
+                <p className="text-[11px] text-[var(--text-tertiary)] truncate mt-px sm:hidden">{activeSectionMeta.description}</p>
+              )}
+            </div>
           </div>
 
           {/* Right: action buttons */}
@@ -2324,15 +2338,15 @@ export function BrandDocument() {
           </div>
         </div>
 
-        {/* Section Description Banner */}
+        {/* Section Description Banner — desktop only; mobile sees it inline in topbar */}
         {activeSectionMeta && (
-          <div className="px-5 py-2 bg-[var(--surface-subtle)] border-b border-[var(--border-subtle)] flex-shrink-0 hidden sm:block">
+          <div className="px-3 sm:px-5 py-2 bg-[var(--surface-subtle)] border-b border-[var(--border-subtle)] flex-shrink-0 hidden sm:block">
             <p className="text-xs text-[var(--text-tertiary)]">{activeSectionMeta.description}</p>
           </div>
         )}
 
         {/* Editor Content */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6">
+        <div className="flex-1 overflow-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeSection}
@@ -2340,17 +2354,11 @@ export function BrandDocument() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18 }}
-              className={cn(
-                "mx-auto",
-                // Colour and Typography get wider canvas
-                activeSection === "color_palette" || activeSection === "typography"
-                  ? "max-w-5xl"
-                  : "max-w-3xl"
-              )}
+              className="w-full px-3 sm:px-5 py-4 sm:py-5"
             >
-              <ActiveEditor 
-                data={currentData} 
-                setData={handleEditorDataChange} 
+              <ActiveEditor
+                data={currentData}
+                setData={handleEditorDataChange}
                 openAssetPicker={(cat, onSelect) => setPickerConfig({ isOpen: true, category: cat, onSelect })}
               />
             </motion.div>
@@ -2398,7 +2406,7 @@ export function BrandDocument() {
               </div>
               <div className="border-t border-[var(--border-subtle)] pt-4">
                 <p className="text-xs font-medium text-[var(--text-primary)] mb-2">Custom Label</p>
-                <TextInput value="" onChange={() => {}} placeholder={activeSectionMeta?.label} />
+                <TextInput value="" onChange={() => { }} placeholder={activeSectionMeta?.label} />
                 <p className="text-xs text-[var(--text-tertiary)] mt-1.5">Overrides the section name shown to clients</p>
               </div>
               <div className="border-t border-[var(--border-subtle)] pt-4">

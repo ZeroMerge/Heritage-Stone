@@ -66,12 +66,20 @@ export function Projects() {
       >
         {/* Row 1: pills (scrollable) + view toggle pinned right */}
         <div className="flex items-center gap-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+          {/*
+            FIX: The inner wrapper gets `pr-10` so the last pill ("Archived")
+            is never hidden under the ViewToggle when the row overflows on mobile.
+            The `sm:pr-0` removes that padding on larger screens where overflow
+            doesn't occur.
+          */}
           <div className="flex-1 min-w-0 overflow-x-auto scrollbar-none">
-            <FilterPills
-              filters={filters}
-              active={activeFilter}
-              onChange={setActiveFilter}
-            />
+            <div className="pr-10 sm:pr-0">
+              <FilterPills
+                filters={filters}
+                active={activeFilter}
+                onChange={setActiveFilter}
+              />
+            </div>
           </div>
           <div className="flex-shrink-0">
             <ViewToggle />

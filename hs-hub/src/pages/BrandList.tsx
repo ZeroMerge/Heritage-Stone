@@ -1,22 +1,40 @@
-// hs-hub/src/pages/BrandList.tsx
+/**
+ * BrandList.tsx
+ * HS-Hub → src/pages/BrandList.tsx
+ */
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { brandsApi, type BrandRow, portalUrl } from "../lib/api.ts";
-import {
-  ExternalLink,
-  LayoutGrid,
-  GitBranch,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Lock,
-} from "lucide-react";
+import { ExternalLink, LayoutGrid, GitBranch, RefreshCw, Lock } from "lucide-react";
 import { clsx } from "clsx";
+import { LiquidScore } from "../components/ui/LiquidScore";
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+function getShortRef(slug: string): string {
+  return slug.replace(/-/g, "").slice(0, 8).toUpperCase();
+}
+
+const ACCENT_PALETTE = [
+  "#B52A1C", "#173A6A", "#0E4A28", "#6B3800",
+  "#5B1A6B", "#0A4A5A", "#4A1A0A", "#1A3A1A",
+];
+
+function accentFromSlug(slug: string): string {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+  }
+  return ACCENT_PALETTE[hash % ACCENT_PALETTE.length];
+}
+
+// ── page ──────────────────────────────────────────────────────────────────────
 
 export function BrandList() {
-  const [brands, setBrands] = useState<BrandRow[]>([]);
+  const [brands, setBrands]   = useState<BrandRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]     = useState<string | null>(null);
 
   const fetchBrands = async () => {
     setLoading(true);
@@ -35,7 +53,6 @@ export function BrandList() {
 
   return (
     <div className="page-pad animate-fade-in">
-      {/* Header */}
       <div className="page-header">
         <div>
           <h1 className="heading-lg text-[var(--text-primary)]">Brands</h1>
@@ -43,123 +60,188 @@ export function BrandList() {
             {brands.length} brand{brands.length !== 1 ? "s" : ""} registered
           </p>
         </div>
-        <button
-          onClick={() => void fetchBrands()}
-          className="hs-btn hs-btn-secondary"
-        >
+        <button onClick={() => void fetchBrands()} className="hs-btn hs-btn-secondary">
           <RefreshCw className={clsx("w-4 h-4", loading && "animate-spin")} />
           <span className="sidebar-label">Refresh</span>
         </button>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="error-banner">{error}</div>}
 
       {loading && !brands.length ? (
         <div className="hs-grid">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="h-44 bg-[var(--bg-surface)] border border-[var(--border-default)] animate-pulse"
+              className="h-52 bg-[var(--bg-surface)] border border-[var(--border-default)] animate-pulse"
             />
           ))}
         </div>
       ) : (
         <div className="hs-grid">
-          {brands.map((brand) => (
-            <BrandCard key={brand.id} brand={brand} />
-          ))}
+          {brands.map((brand) => <BrandCard key={brand.id} brand={brand} />)}
         </div>
       )}
     </div>
   );
 }
 
+// ── brand card ────────────────────────────────────────────────────────────────
+
 function BrandCard({ brand }: { brand: BrandRow }) {
+  const accent      = accentFromSlug(brand.slug);
+  const ref         = getShortRef(brand.slug);
   const isPublished = brand.is_published;
 
-  return (
-    <div className="hs-card flex flex-col overflow-hidden">
-      {/* Accent line */}
-      <div className="h-0.5 bg-[var(--hs-accent)]" />
+  const updatedDate = new Date(brand.updated_at).toLocaleDateString(undefined, {
+    month: "short", day: "numeric", year: "numeric",
+  });
 
-      <div className="p-5 flex-1">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="min-w-0">
-            <h2 className="heading-sm text-[var(--text-primary)] leading-tight mb-1 truncate">
-              {brand.brand_name}
-            </h2>
-            <span className="text-xs-mono">/{brand.slug}</span>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {brand.password_protected && (
-              <span title="Password protected">
-                <Lock className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
-              </span>
-            )}
-            <span
-              className={clsx(
-                "flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border",
-                isPublished
-                  ? "bg-green-500/10 text-green-500 border-green-500/20"
-                  : "bg-[var(--bg-elevated)] text-[var(--text-tertiary)] border-[var(--border-default)]"
-              )}
-            >
-              {isPublished
-                ? <><CheckCircle className="w-3 h-3" />Live</>
-                : <><XCircle className="w-3 h-3" />Draft</>}
-            </span>
-          </div>
+  // BrandRow doesn't have a health score, so we derive a proxy from
+  // version number as a placeholder — swap for real field when available.
+  const healthProxy = Math.min(100, Math.round((brand.version ?? 1) * 20));
+
+  return (
+    <div
+      className="group relative overflow-hidden"
+      style={{ backgroundColor: accent }}
+    >
+      {/* Dashed seam */}
+      <div
+        className="absolute pointer-events-none z-10"
+        style={{ inset: 7, border: "1px dashed rgba(255,255,255,0.22)" }}
+      />
+
+      {/* ── HEADER: meta left · score + lock right ── */}
+      <div className="relative z-20 flex items-start justify-between px-4 pt-4 gap-2">
+        <div className="space-y-[3px]">
+          <p
+            className="text-[9px] uppercase text-white/45 leading-none"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em" }}
+          >
+            Category // Brand
+          </p>
+          <p
+            className="text-[9px] uppercase text-white/35 leading-none"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em" }}
+          >
+            Ref. Doc: {ref}
+          </p>
+          <p
+            className="text-[9px] uppercase text-white/35 leading-none"
+            style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.2em" }}
+          >
+            Template // {brand.template?.name ?? brand.template_id ?? "None"}
+          </p>
         </div>
 
-        <div className="space-y-2 text-xs">
-          <div className="flex justify-between items-baseline border-b border-[var(--border-faint)] pb-1.5">
-            <span className="text-[var(--text-tertiary)]">Template</span>
-            <span className="font-mono text-[var(--hs-accent)] truncate ml-4">
-              {brand.template?.name ?? brand.template_id ?? "—"}
+        <div className="flex items-start gap-1.5 flex-shrink-0">
+          {brand.password_protected && (
+            <span
+              className="flex items-center justify-center w-5 h-5 mt-1 bg-black/20"
+              title="Password protected"
+            >
+              <Lock className="w-3 h-3 text-white/50" />
             </span>
-          </div>
-          <div className="flex justify-between items-baseline border-b border-[var(--border-faint)] pb-1.5">
-            <span className="text-[var(--text-tertiary)]">Version</span>
-            <span className="font-mono text-[var(--text-primary)]">{brand.version}</span>
-          </div>
-          <div className="flex justify-between items-baseline">
-            <span className="text-[var(--text-tertiary)]">Updated</span>
-            <span className="text-[var(--text-primary)]">
-              {new Date(brand.updated_at).toLocaleDateString()}
-            </span>
-          </div>
+          )}
+          {/* Published status pill */}
+          <span
+            className="text-[9px] font-black uppercase tracking-[0.15em] text-white/65 mt-1"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            {isPublished ? "LIVE" : "DRAFT"}
+          </span>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="px-5 py-3 border-t border-[var(--border-faint)] bg-[var(--bg-subtle)] flex items-center gap-2 flex-wrap">
-        <Link
-          to={`/assign/${brand.slug}`}
-          className="hs-btn hs-btn-secondary !px-3 !py-1.5 !text-[11px]"
+      {/* Rule */}
+      <div
+        className="mx-4 mt-3"
+        style={{ height: "1px", backgroundColor: "rgba(255,255,255,0.2)" }}
+      />
+
+      {/* ── BODY: brand name · slug ── */}
+      <div className="px-4 pt-3 pb-2">
+        <h2
+          className="font-black text-white leading-[1.0]"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(18px, 3.5vw, 26px)",
+            letterSpacing: "-0.04em",
+          }}
         >
-          <LayoutGrid className="w-3.5 h-3.5" />
-          Assign
-        </Link>
-        <Link
-          to={`/locks?slug=${brand.slug}`}
-          className="hs-btn hs-btn-secondary !px-3 !py-1.5 !text-[11px]"
+          {brand.brand_name}
+        </h2>
+        <p
+          className="mt-2 text-[11px] text-white/55 leading-relaxed"
+          style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.06em" }}
         >
-          <GitBranch className="w-3.5 h-3.5" />
-          Locks
-        </Link>
-        <a
-          href={portalUrl(brand.slug)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ml-auto hs-btn hs-btn-primary !px-3 !py-1.5 !text-[11px]"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          Preview
-        </a>
+          /{brand.slug}
+        </p>
+      </div>
+
+      {/* ── FOOTER: version · date · liquid score · actions ── */}
+      <div
+        className="flex items-center justify-between flex-wrap gap-2 px-4 pb-4 pt-2.5"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}
+      >
+        {/* Left: version + date */}
+        <div className="flex items-center gap-3">
+          <span
+            className="text-[9px] uppercase tracking-[0.15em] text-white/45"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            v{brand.version}
+          </span>
+          <span style={{ width: 1, height: 10, backgroundColor: "rgba(255,255,255,0.2)", display: "inline-block" }} />
+          <span
+            className="text-[9px] uppercase tracking-[0.15em] text-white/45"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            {updatedDate}
+          </span>
+        </div>
+
+        {/* Right: liquid score + action buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Liquid score — hover to trouble the water */}
+          <LiquidScore
+            score={healthProxy}
+            brandColour={accent}
+            fontSize={22}
+            className="mr-1"
+          />
+
+          <Link
+            to={`/assign/${brand.slug}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-bold px-2 py-1 border border-white/25 text-white/65 hover:bg-white/10 transition-colors"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            <LayoutGrid className="w-2.5 h-2.5" />
+            Assign
+          </Link>
+          <Link
+            to={`/locks?slug=${brand.slug}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-bold px-2 py-1 border border-white/25 text-white/65 hover:bg-white/10 transition-colors"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            <GitBranch className="w-2.5 h-2.5" />
+            Locks
+          </Link>
+          <a
+            href={portalUrl(brand.slug)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] font-black px-2 py-1 bg-white text-black hover:bg-white/90 transition-colors"
+            style={{ fontFamily: "var(--font-mono)" }}
+          >
+            <ExternalLink className="w-2.5 h-2.5" />
+            Preview
+          </a>
+        </div>
       </div>
     </div>
   );
