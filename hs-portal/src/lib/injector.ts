@@ -4,23 +4,16 @@
 //   2. CSS variables for primary/secondary brand colors
 // Templates NEVER fetch data — they read window.__BRAND_DATA__ only.
 
-import fs from "fs";
-import path from "path";
+
 import type { HydratedBrandData } from "../types/index.js";
 import { logger } from "./logger.js";
 
 /**
- * Read index.html from a template's dist folder,
- * inject brand data, and return the modified HTML string.
+ * Inject brand data into raw HTML string,
+ * add CSS variables for primary/secondary brand colors
+ * and return the modified HTML string.
  */
-export function injectBrandData(distPath: string, data: HydratedBrandData): string {
-  const indexPath = path.join(distPath, "index.html");
-
-  if (!fs.existsSync(indexPath)) {
-    throw new Error(`Template dist not found: ${indexPath}`);
-  }
-
-  let html = fs.readFileSync(indexPath, "utf-8");
+export function injectBrandData(html: string, data: HydratedBrandData): string {
 
   // Derive primary color from the first is_primary color, fallback to #000
   const primaryColor =

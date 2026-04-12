@@ -108,7 +108,12 @@ const uploadLimiter = rateLimit({
   message: { ok: false, error: "Upload rate limit exceeded." },
 });
 
-// ─── Health check ─────────────────────────────────────────────────────────────
+// ─── Health check & Keep-Alive ────────────────────────────────────────────────
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 app.get("/health", (_req, res) => {
   res.json({
@@ -118,6 +123,16 @@ app.get("/health", (_req, res) => {
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV ?? "development",
   });
+});
+
+app.get("/api/ping", async (_req, res) => {
+  try {
+    // Ping Supabase to keep connections active
+    await supabase.from('templates').select('id').limit(1);
+    res.status(200).send("OK");
+  } catch (err) {
+    res.status(500).send("DB Error");
+  }
 });
 
 // ─── Subdomain router (MUST be first) ─────────────────────────────────────────
@@ -165,7 +180,6 @@ app.listen(PORT, () => {
   logger.info(`hs-portal running on http://localhost:${PORT}`);
   logger.info(`Allowed origins: ${allowedOrigins.join(", ")}`);
   logger.info(`Cache TTL: ${process.env.CACHE_TTL_SECONDS ?? 300}s`);
-  logger.info(`Templates dir: ${process.env.TEMPLATES_DIR ?? "./templates"}`);
   logger.info(`Portal base domain: ${process.env.PORTAL_BASE_DOMAIN ?? "(not set — subdomain routing disabled)"}`);
 });
 

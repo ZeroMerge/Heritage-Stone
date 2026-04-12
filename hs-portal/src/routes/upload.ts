@@ -70,7 +70,7 @@ uploadRouter.post(
 
 /**
  * DELETE /upload/template/:templateId
- * Remove a template by ID. Deregisters from Supabase and removes dist folder.
+ * Remove a template by ID. Deregisters from Supabase database and removes from Supabase Storage.
  * Requires HUB_SECRET.
  */
 uploadRouter.delete("/template/:templateId", async (req: Request, res: Response) => {
@@ -81,8 +81,6 @@ uploadRouter.delete("/template/:templateId", async (req: Request, res: Response)
 
   const { templateId } = req.params;
   const { createClient } = await import("@supabase/supabase-js");
-  const fs = await import("fs");
-  const path = await import("path");
 
   const supabase = createClient(
     process.env.SUPABASE_URL!,
@@ -98,11 +96,32 @@ uploadRouter.delete("/template/:templateId", async (req: Request, res: Response)
   if (error) return res.status(502).json({ ok: false, error: error.message });
   if (!template) return res.status(404).json({ ok: false, error: "Template not found" });
 
-  // Remove from disk
-  const templateDir = path.dirname(template.dist_path as string);
-  fs.rmSync(templateDir, { recursive: true, force: true });
+  // Remove from Supabase Storage individually
+  // dist_path holds the templateId prefix in the stateless setup.
+  const prefix = template.dist_path as string;
+  if (prefix) {
+    const emptyDirectory = async (dirPath: string) => {
+      const { data: list } = await supabase.storage.from("stone-templates").list(dirPath);
+      if (!list) return;
+      
+      const filesToRemove = [];
+      for (const item of list) {
+        if (item.id === null) {
+          await emptyDirectory(`${dirPath}/${item.name}`);
+        } else {
+          filesToRemove.push(`${dirPath}/${item.name}`);
+        }
+      }
+      
+      if (filesToRemove.length > 0) {
+        await supabase.storage.from("stone-templates").remove(filesToRemove);
+      }
+    };
+    
+    await emptyDirectory(prefix);
+  }
 
-  // Remove from Supabase
+  // Remove from Supabase Database
   await supabase.from("templates").delete().eq("id", templateId);
 
   logger.info(`[upload] Deleted template: ${templateId}`);

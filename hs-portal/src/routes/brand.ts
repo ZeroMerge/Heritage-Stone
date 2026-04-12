@@ -3,15 +3,19 @@
 // and serves the result. This is the primary portal-serving route.
 
 import { Router, Request, Response } from "express";
-import path from "path";
-import fs from "fs";
 import { hydrateBrand, HydrationError } from "../lib/hydrator.js";
 import { cacheGet, cacheSet } from "../lib/cache.js";
 import { injectBrandData } from "../lib/injector.js";
 import { logger } from "../lib/logger.js";
 import type { HydratedBrandData } from "../types/index.js";
+import { createClient } from "@supabase/supabase-js";
 
 export const brandRouter = Router();
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 /**
  * GET /portal/:slug
@@ -51,14 +55,26 @@ brandRouter.get("/:slug", async (req: Request, res: Response) => {
       return res.status(503).send(noTemplatePage(data.brand.brand_name));
     }
 
-    const distPath = template.dist_path;
-    if (!distPath || !fs.existsSync(path.join(distPath, "index.html"))) {
-      logger.error(`[brand] Template dist not found at: ${distPath}`);
+    const templateId = template.dist_path; // On Supabase this is the bucket prefix
+    if (!templateId) {
+      logger.error(`[brand] Template dist not found for slug: ${slug}`);
       return res.status(503).send(noTemplatePage(data.brand.brand_name));
     }
 
+    // Download index.html from Supabase Storage
+    const { data: fileData, error } = await supabase.storage
+      .from("stone-templates")
+      .download(`${templateId}/index.html`);
+
+    if (error || !fileData) {
+      logger.error(`[brand] Template index.html not found in Supabase at ${templateId}: ${error?.message}`);
+      return res.status(503).send(noTemplatePage(data.brand.brand_name));
+    }
+
+    const rawHtml = await fileData.text();
+
     // 5. Inject brand data and serve
-    const html = injectBrandData(distPath, data);
+    const html = injectBrandData(rawHtml, data);
     return res.status(200).setHeader("Content-Type", "text/html").send(html);
   } catch (err) {
     if (err instanceof HydrationError) {
@@ -95,19 +111,16 @@ brandRouter.get("/:slug/assets/*", async (req: Request, res: Response) => {
   const template = data.brand.template;
   if (!template?.dist_path) return res.status(404).end();
 
-  const assetsDir = path.join(template.dist_path, "assets");
-  const fullPath = path.join(assetsDir, assetPath);
-  
-  // Security: Prevent path traversal
-  const resolvedPath = path.resolve(fullPath);
-  if (!resolvedPath.startsWith(path.resolve(assetsDir))) {
-    logger.warn(`[brand] Blocked potential path traversal: ${assetPath}`);
-    return res.status(403).end();
-  }
+  const templateId = template.dist_path;
+  const objectPath = `${templateId}/assets/${assetPath}`;
 
-  if (!fs.existsSync(fullPath)) return res.status(404).end();
+  // Simply generate the public URL (ensure the stone-templates bucket is set to PUBLIC in Supabase)
+  const { data: publicUrlData } = supabase.storage
+    .from("stone-templates")
+    .getPublicUrl(objectPath);
 
-  return res.sendFile(fullPath);
+  // Redirect to offload bandwidth to Supabase CDN
+  return res.redirect(302, publicUrlData.publicUrl);
 });
 
 // ─── Inline HTML Helpers ──────────────────────────────────────────────────────
