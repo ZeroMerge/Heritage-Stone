@@ -2060,6 +2060,7 @@ export function BrandDocument() {
   const [showSettings, setShowSettings] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);  // mobile drawer
   const [sectionData, setSectionData] = useState<Record<string, any>>({});
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [pickerConfig, setPickerConfig] = useState<{
     isOpen: boolean;
     category?: AssetCategory;
@@ -2068,28 +2069,43 @@ export function BrandDocument() {
 
   const { setUnsavedChanges, unsavedChanges } = useDocumentEditorStore();
   const { showToast } = useUIStore();
-  const { brandSections, updateProjectSection, publishProject, saveIndicator } = useProjectsStore();
+  const { brandSections, fetchBrandSections, updateProjectSection, publishProject, saveIndicator } = useProjectsStore();
 
-  // Initialize sectionData from store
+  // ── Fetch brand sections from Supabase on mount ──────────────────────────
+  useEffect(() => {
+    if (!project?.id) return;
+    fetchBrandSections(project.id);
+  }, [project?.id, fetchBrandSections]);
+
+  // ── Hydrate local editor state whenever the store updates ────────────────
+  // DB data always wins over the empty default `{}` state.
+  // We only do this ONCE after the first fetch to avoid clobbering live edits.
   useEffect(() => {
     if (!project?.id) return;
     const initialData: Record<string, unknown> = {};
+    let hasAny = false;
     sections.forEach((s) => {
       const key = `${project.id}-${s.id}`;
       const sectionArr = brandSections[key];
-      // brandSections[key] is BrandSection[] — take the first element's content
       if (sectionArr && sectionArr.length > 0) {
-        initialData[s.id] = (sectionArr[0] as { content?: unknown }).content ?? {};
+        const content = (sectionArr[0] as { content?: unknown }).content;
+        if (content && typeof content === 'object' && Object.keys(content).length > 0) {
+          initialData[s.id] = content;
+          hasAny = true;
+        }
       }
     });
-    setSectionData((prev) => ({ ...initialData, ...prev }));
+    if (hasAny || !dataLoaded) {
+      // DB data wins — overwrite any empty placeholder with real data
+      setSectionData((prev) => ({ ...prev, ...initialData }));
+      setDataLoaded(true);
+    }
   }, [project?.id, brandSections]);
 
-  // handleSave — declared BEFORE the useEffect that references it
+  // ── handleSave — saves ONLY the active section (other sections auto-save on their own debounce) ──
   const handleSave = useCallback(async () => {
     if (!project?.id) return;
     try {
-      // Capture currentData at call-time via functional update path
       const snapshot = sectionData[activeSection] || {};
       await updateProjectSection(project.id, activeSection, snapshot);
       setUnsavedChanges(false);
@@ -2098,12 +2114,24 @@ export function BrandDocument() {
     }
   }, [project?.id, activeSection, sectionData, updateProjectSection, setUnsavedChanges, showToast]);
 
-  // Auto-save debounce
+  // ── Auto-save: debounce 2 s after each change ─────────────────────────────
   useEffect(() => {
     if (!unsavedChanges) return;
     const t = setTimeout(handleSave, 2000);
     return () => clearTimeout(t);
   }, [unsavedChanges, handleSave]);
+
+  // ── Flush pending save when switching sections ────────────────────────────
+  const handleSectionSwitch = useCallback(async (next: SupabaseSectionType) => {
+    if (unsavedChanges && project?.id) {
+      try {
+        const snapshot = sectionData[activeSection] || {};
+        await updateProjectSection(project.id, activeSection, snapshot);
+        setUnsavedChanges(false);
+      } catch { /* best effort */ }
+    }
+    setActiveSection(next);
+  }, [unsavedChanges, project?.id, activeSection, sectionData, updateProjectSection, setUnsavedChanges]);
 
   const currentData = sectionData[activeSection] ?? {};
   const ActiveEditor = sectionEditors[activeSection];
@@ -2180,7 +2208,7 @@ export function BrandDocument() {
                 return (
                   <button
                     key={section.id}
-                    onClick={() => { setActiveSection(section.id); setSidebarOpen(false); }}
+                    onClick={() => { handleSectionSwitch(section.id); setSidebarOpen(false); }}
                     className={cn(
                       "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-left transition-all",
                       isActive
@@ -2244,7 +2272,7 @@ export function BrandDocument() {
             return (
               <button
                 key={section.id}
-                onClick={() => { setActiveSection(section.id); setSidebarOpen(false); }}
+                onClick={() => { handleSectionSwitch(section.id); setSidebarOpen(false); }}
                 title={section.label}
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all group",

@@ -281,12 +281,15 @@ const mapSupabaseProjectToProject = (p: SupabaseProjectRow): Project => ({
   updatedAt: p.updated_at as string,
 });
 
-// Helper to convert camelCase object keys to snake_case for Supabase
-const camelToSnake = (obj: Record<string, unknown>): Record<string, unknown> => {
+// Helper to convert camelCase object keys to snake_case for Supabase (deep recursive)
+const camelToSnake = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  if (typeof obj !== 'object') return obj;
   const snakeObj: Record<string, unknown> = {};
   for (const key in obj) {
     const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-    snakeObj[snakeKey] = obj[key];
+    snakeObj[snakeKey] = camelToSnake((obj as any)[key]); // recurse
   }
   return snakeObj;
 };
@@ -933,12 +936,17 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         supabase.from("brand_resources").select("*").eq("brand_id", projectId).order("sort_order"),
       ]);
 
-      const snakeToCamel = (obj: any) => {
-        if (!obj) return obj;
+      // Deep recursive snake_case → camelCase conversion (handles nested JSON)
+      const snakeToCamel = (obj: any): any => {
+        if (obj === null || obj === undefined) return obj;
+        if (Array.isArray(obj)) return obj.map(snakeToCamel);
+        if (typeof obj !== 'object') return obj;
         const camelObj: any = {};
         for (const key in obj) {
-          const camelKey = key.replace(/([-_][a-z])/g, group => group.toUpperCase().replace('-', '').replace('_', ''));
-          camelObj[camelKey] = obj[key];
+          const camelKey = key.replace(/([-_][a-z])/g, group =>
+            group.toUpperCase().replace('-', '').replace('_', '')
+          );
+          camelObj[camelKey] = snakeToCamel(obj[key]); // recurse into values
         }
         return camelObj;
       };
@@ -947,9 +955,17 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
       if (intro) sectionsMap.introduction = snakeToCamel(intro);
       if (strat) {
-        sectionsMap.strategy = snakeToCamel(strat);
-        sectionsMap.voice_tone = snakeToCamel({ tone_of_voice: strat.tone_of_voice, brand_personality: strat.brand_personality, target_audience: strat.target_audience });
-        sectionsMap.messaging = snakeToCamel({ messaging: strat.messaging });
+        const camelStrat = snakeToCamel(strat);
+        sectionsMap.strategy = camelStrat;
+        // voice_tone and messaging share the brand_strategies row
+        sectionsMap.voice_tone = {
+          toneOfVoice: camelStrat.toneOfVoice ?? { descriptors: [], dos: [], donts: [] },
+          brandPersonality: camelStrat.brandPersonality ?? { archetype: null, adjectives: [], antiAdjectives: [] },
+          targetAudience: camelStrat.targetAudience ?? null,
+        };
+        sectionsMap.messaging = {
+          messaging: camelStrat.messaging ?? { headline: null, taglines: [], keyMessages: [], ctaGuidelines: null },
+        };
       }
       if (logos && logos.length) sectionsMap.logo = { logos: logos.map(snakeToCamel) };
       if (colors && colors.length) sectionsMap.color_palette = { colors: colors.map(snakeToCamel) };
@@ -983,6 +999,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       console.error("Error fetching brand sections:", err);
     }
   },
+
 
   updateProjectSection: async (projectId, sectionType, data) => {
     try {
@@ -1020,15 +1037,37 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
               ...camelToSnake(row),
               brand_id: projectId,
               sort_order: i,
-              id: row.id ?? undefined // preserve ID if exists
+              id: (row as any).id ?? undefined // preserve ID if exists
             }))
           );
           if (error) throw error;
         }
+      } else if (sectionType === 'voice_tone') {
+        // voice_tone maps specific fields onto the brand_strategies row
+        const { error } = await supabase
+          .from('brand_strategies')
+          .upsert({
+            brand_id: projectId,
+            tone_of_voice: (data as any).toneOfVoice ?? null,
+            brand_personality: (data as any).brandPersonality ?? null,
+            target_audience: (data as any).targetAudience ?? null,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'brand_id' });
+        if (error) throw error;
+      } else if (sectionType === 'messaging') {
+        // messaging maps the messaging field onto brand_strategies
+        const { error } = await supabase
+          .from('brand_strategies')
+          .upsert({
+            brand_id: projectId,
+            messaging: (data as any).messaging ?? null,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'brand_id' });
+        if (error) throw error;
       } else {
-        // Single-row tables — convert camelCase from UI to snake_case for Supabase
+        // Single-row tables — deep convert camelCase from UI to snake_case for Supabase
         const snakeData = camelToSnake(data);
-        delete snakeData.brand_id; // remove if somehow present in data to avoid conflicts
+        delete (snakeData as any).brand_id; // remove if somehow present to avoid conflicts
 
         const { error } = await supabase
           .from(tableName)

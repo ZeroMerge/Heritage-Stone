@@ -134,14 +134,18 @@ export function ProjectLayout() {
       headingFont: "Playfair Display, serif",
       bodyFont: "Inter, sans-serif",
     });
-    
-    // Safely construct the URL, fallback to local dev url if empty
-    const portalUrl = (project.portalSettings?.url && project.portalSettings.url.trim())
-      ? `https://${project.portalSettings.url.trim()}` 
-      : (import.meta.env.VITE_PORTAL_URL || (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
-            ? window.location.origin.replace("studio", "hub")
-            : "http://localhost:5174"));
-      
+
+    // Hub URL: use env var (production) or fall back to localhost for dev
+    const hubBase =
+      import.meta.env.VITE_HUB_URL ||
+      (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+        ? "https://heritagehub.ravennorthstudio.com"
+        : "http://localhost:5173");
+
+    // Optionally deep-link to the specific brand slug
+    const slug = project.clientSlug || "";
+    const portalUrl = slug ? `${hubBase}/brand/${slug}` : hubBase;
+
     window.open(portalUrl, "_blank");
   };
 
@@ -258,7 +262,7 @@ export function ProjectLayout() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="p-4 sm:p-6 pb-24 sm:pb-6"
+              className={currentPath.includes("/brand-document") ? "h-full" : "p-4 sm:p-6 pb-24 sm:pb-6"}
             >
               <Outlet context={{ project }} />
             </motion.div>
