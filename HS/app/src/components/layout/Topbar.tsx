@@ -42,7 +42,7 @@ function PortalDropdown({
 export function Topbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { toggleSidebar, setSearchModalOpen } = useUIStore();
+  const { setSearchModalOpen } = useUIStore();
   const { user, logout } = useAuthStore();
   const { unsavedChanges } = useDocumentEditorStore();
   const [showUserMenu, setShowUserMenu] = useState(false);

@@ -187,7 +187,7 @@ function BrandCard({ brand }: { brand: BrandRow }) {
   // Use real health_score if stored, else derive proxy from version
   const healthScore = typeof brand.health_score === "number"
     ? brand.health_score
-    : Math.min(100, Math.round((brand.version ?? 1) * 20));
+    : Math.min(100, Math.round(Number(brand.version ?? 1) * 20));
 
   return (
     <div

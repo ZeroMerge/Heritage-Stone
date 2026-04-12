@@ -849,34 +849,6 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
     }
   },
 
-  fetchClientMembers: async (projectId) => {
-    try {
-      const { data, error } = await supabase
-        .from("client_members")
-        .select("*")
-        .eq("brand_id", projectId);
-
-      if (error) throw error;
-
-      const members: ClientMember[] = (data || []).map((m: any) => ({
-        id: m.id,
-        projectId: m.brand_id,
-        name: m.name as string,
-        email: m.email as string,
-        permissionLevel: m.permission_level as ClientMember["permissionLevel"],
-        lastLogin: (m.last_login_at as string) ?? null,
-        invitedAt: m.created_at as string,
-        invitedBy: "Admin",
-        isActive: true
-      }));
-
-      set((state) => ({
-        clientMembers: { ...state.clientMembers, [projectId]: members }
-      }));
-    } catch (err) {
-      console.error("Error fetching client members:", err);
-    }
-  },
 
   fetchChatMessages: async (projectId) => {
     try {

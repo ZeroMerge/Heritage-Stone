@@ -5,7 +5,7 @@ import { Topbar } from "./Topbar";
 import { TopbarMobile } from "./TopbarMobile";
 import { BottomNav } from "./BottomNav";
 import { useEffect } from "react";
-import { useUIStore, useProjectsStore } from "@/store";
+import { useProjectsStore } from "@/store";
 import { NewProjectModal } from "@/components/ui-custom/modals/NewProjectModal";
 import { SearchModal } from "@/components/ui-custom/modals/SearchModal";
 import { ConfirmModal } from "@/components/ui-custom/modals/ConfirmModal";
