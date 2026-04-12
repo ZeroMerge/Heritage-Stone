@@ -1,20 +1,13 @@
 services:
   - type: web
     name: hs-portal
-    env: docker
-    dockerfilePath: Dockerfile
-    # Render overrides the Dockerfile EXPOSE depending on routing. 
-    # Use health check to ensure deployment only finishes when ready.
-    healthCheckPath: /
-    # Persistent disk for template uploads
-    disk:
-      name: hs-templates
-      mountPath: /app/templates
-      sizeGB: 1
+    env: node
+    plan: free # Force the free tier
+    buildCommand: ./render-build.sh
+    startCommand: node dist/index.js # Adjust this to your actual start command
     envVars:
       - key: NODE_ENV
         value: production
-      # Define other required variables as placeholders or fetch them from the dashboard
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
@@ -24,12 +17,8 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: HUB_ORIGIN
-        sync: false
+        value: https://heritagehub.ravennorthstudio.com
       - key: STUDIO_ORIGIN
-        sync: false
-      - key: HUB_SECRET
-        sync: false
-      - key: TEMPLATES_DIR
-        value: /app/templates
+        value: https://heritagestone.ravennorthstudio.com
       - key: PORTAL_BASE_DOMAIN
-        sync: false
+        value: hub.ravennorthstudio.com
